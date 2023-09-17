@@ -1,8 +1,9 @@
-'use client'
+'use client';
 
-import { Canvas } from '@react-three/fiber'
-import { Preload } from '@react-three/drei'
-import { r3f } from '@/helpers/global'
+import { Canvas } from '@react-three/fiber';
+import { Preload } from '@react-three/drei';
+import { r3f } from '@/helpers/global';
+import { PlayingCard } from './playing-card/PlayingCard';
 
 export default function Scene({ ...props }) {
   // Everything defined in here will persist between route changes, only children are swapped
@@ -12,5 +13,5 @@ export default function Scene({ ...props }) {
       <r3f.Out />
       <Preload all />
     </Canvas>
-  )
+  );
 }
