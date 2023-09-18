@@ -17,7 +17,7 @@ import { Three } from '@/helpers/components/Three';
 import { ColorRepresentation } from 'three';
 
 type CommonProps = {
-  color: ColorRepresentation;
+  color?: ColorRepresentation;
 };
 export const Common = ({ color }: CommonProps) => (
   <Suspense fallback={null}>
