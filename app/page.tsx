@@ -53,12 +53,12 @@ const Common = dynamic(
 export default function Page() {
   return (
     <>
-      <div className='mx-auto flex h-screen w-full flex-col flex-wrap items-center p-12 md:flex-row  lg:w-4/5'>
-        <div className='relative my-12 h-96 w-full py-6 '>
+      <div className='mx-auto flex h-screen w-full flex-col flex-wrap items-center p-4 '>
+        <div className='relative m-0 h-full w-full p-0 '>
           <View orbit className='relative h-full w-full'>
             <Suspense fallback={null}>
               <PlayingCard />
-              <Common color={'lightblue'} />
+              <Common color={'#03C03C'} />
             </Suspense>
           </View>
         </div>
