@@ -73,7 +73,12 @@ export default function Scroll({ children }) {
 
 export const ScrollTicker = ({ smooth = 9999999 }) => {
   useFrame(({ viewport, camera }, delta) => {
-    camera.position.y = damp(camera.position.y, -state.progress * viewport.height, smooth, delta);
+    camera.position.y = damp(
+      camera.position.y,
+      -state.progress * viewport.height,
+      smooth,
+      delta,
+    );
   });
 
   return null;

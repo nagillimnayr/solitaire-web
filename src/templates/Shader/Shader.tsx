@@ -24,7 +24,14 @@ const Shader = forwardRef(({ children, ...props }, ref) => {
   useImperativeHandle(ref, () => localRef.current);
 
   useFrame((_, delta) => (localRef.current.time += delta));
-  return <shaderImpl ref={localRef} glsl={THREE.GLSL3} {...props} attach='material' />;
+  return (
+    <shaderImpl
+      ref={localRef}
+      glsl={THREE.GLSL3}
+      {...props}
+      attach='material'
+    />
+  );
 });
 
 export default Shader;

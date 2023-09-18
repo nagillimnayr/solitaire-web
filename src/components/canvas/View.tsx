@@ -1,7 +1,11 @@
 'use client';
 
 import { forwardRef, Suspense, useImperativeHandle, useRef } from 'react';
-import { OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei';
+import {
+  OrbitControls,
+  PerspectiveCamera,
+  View as ViewImpl,
+} from '@react-three/drei';
 import { Three } from '@/helpers/components/Three';
 
 export const Common = ({ color }) => (

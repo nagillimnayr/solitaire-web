@@ -19,7 +19,10 @@ export const Blob = ({ route = '/', ...props }) => {
       {...props}
     >
       <sphereGeometry args={[1, 64, 64]} />
-      <MeshDistortMaterial roughness={0} color={hovered ? 'hotpink' : '#1fb2f5'} />
+      <MeshDistortMaterial
+        roughness={0}
+        color={hovered ? 'hotpink' : '#1fb2f5'}
+      />
     </mesh>
   );
 };
@@ -29,7 +32,13 @@ export const Logo = ({ route = '/blob', ...props }) => {
   const router = useRouter();
 
   const [hovered, hover] = useState(false);
-  const points = useMemo(() => new THREE.EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(100), []);
+  const points = useMemo(
+    () =>
+      new THREE.EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(
+        100,
+      ),
+    [],
+  );
 
   useCursor(hovered);
   useFrame((state, delta) => {
@@ -44,12 +53,31 @@ export const Logo = ({ route = '/blob', ...props }) => {
       {/* @ts-ignore */}
       <Line worldUnits points={points} color='#1fb2f5' lineWidth={0.15} />
       {/* @ts-ignore */}
-      <Line worldUnits points={points} color='#1fb2f5' lineWidth={0.15} rotation={[0, 0, 1]} />
+      <Line
+        worldUnits
+        points={points}
+        color='#1fb2f5'
+        lineWidth={0.15}
+        rotation={[0, 0, 1]}
+      />
       {/* @ts-ignore */}
-      <Line worldUnits points={points} color='#1fb2f5' lineWidth={0.15} rotation={[0, 0, -1]} />
-      <mesh onClick={() => router.push(route)} onPointerOver={() => hover(true)} onPointerOut={() => hover(false)}>
+      <Line
+        worldUnits
+        points={points}
+        color='#1fb2f5'
+        lineWidth={0.15}
+        rotation={[0, 0, -1]}
+      />
+      <mesh
+        onClick={() => router.push(route)}
+        onPointerOver={() => hover(true)}
+        onPointerOut={() => hover(false)}
+      >
         <sphereGeometry args={[0.55, 64, 64]} />
-        <meshPhysicalMaterial roughness={0} color={hovered ? 'hotpink' : '#1fb2f5'} />
+        <meshPhysicalMaterial
+          roughness={0}
+          color={hovered ? 'hotpink' : '#1fb2f5'}
+        />
       </mesh>
     </group>
   );
