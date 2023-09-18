@@ -5,10 +5,7 @@ import { type ReactNode, useMemo } from 'react';
 extend({ RoundedPlaneGeometry });
 declare module '@react-three/fiber' {
   interface ThreeElements {
-    roundedPlaneGeometry: BufferGeometryNode<
-      RoundedPlaneGeometry,
-      typeof RoundedPlaneGeometry
-    >;
+    roundedPlaneGeometry: BufferGeometryNode<RoundedPlaneGeometry, typeof RoundedPlaneGeometry>;
   }
 }
 
@@ -20,13 +17,7 @@ interface RoundedRectProps {
   children?: ReactNode;
 }
 
-export const RoundedRect = ({
-  width,
-  height,
-  radius,
-  segments,
-  children,
-}: RoundedRectProps) => {
+export const RoundedRect = ({ width, height, radius, segments, children }: RoundedRectProps) => {
   const geometry = useMemo(() => {
     return new RoundedPlaneGeometry(width, height, radius, segments);
   }, [height, radius, segments, width]);

@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { forwardRef, Suspense, useImperativeHandle, useRef } from 'react'
-import { OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei'
-import { Three } from '@/helpers/components/Three'
+import { forwardRef, Suspense, useImperativeHandle, useRef } from 'react';
+import { OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei';
+import { Three } from '@/helpers/components/Three';
 
 export const Common = ({ color }) => (
   <Suspense fallback={null}>
@@ -12,11 +12,11 @@ export const Common = ({ color }) => (
     <pointLight position={[-10, -10, -10]} color='blue' />
     <PerspectiveCamera makeDefault fov={40} position={[0, 0, 6]} />
   </Suspense>
-)
+);
 
 const View = forwardRef(({ children, orbit, ...props }, ref) => {
-  const localRef = useRef(null)
-  useImperativeHandle(ref, () => localRef.current)
+  const localRef = useRef(null);
+  useImperativeHandle(ref, () => localRef.current);
 
   return (
     <>
@@ -28,8 +28,8 @@ const View = forwardRef(({ children, orbit, ...props }, ref) => {
         </ViewImpl>
       </Three>
     </>
-  )
-})
-View.displayName = 'View'
+  );
+});
+View.displayName = 'View';
 
-export { View }
+export { View };

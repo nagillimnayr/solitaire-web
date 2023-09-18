@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { useRef } from 'react'
-import dynamic from 'next/dynamic'
-const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
+import { useRef } from 'react';
+import dynamic from 'next/dynamic';
+const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false });
 
 const Layout = ({ children }) => {
-  const ref = useRef()
+  const ref = useRef();
 
   return (
     <div
@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
         eventPrefix='client'
       />
     </div>
-  )
-}
+  );
+};
 
-export { Layout }
+export { Layout };
