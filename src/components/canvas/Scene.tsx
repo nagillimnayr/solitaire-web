@@ -1,11 +1,11 @@
 'use client';
 
-import { Canvas } from '@react-three/fiber';
+import { Canvas, CanvasProps } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import { r3f } from '@/helpers/global';
-import { PlayingCard } from './playing-card/PlayingCard';
 
-export default function Scene({ ...props }) {
+type SceneProps = Omit<CanvasProps, 'children'>;
+export default function Scene({ ...props }: SceneProps) {
   // Everything defined in here will persist between route changes, only children are swapped
   return (
     <Canvas {...props}>
