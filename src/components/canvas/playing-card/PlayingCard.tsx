@@ -14,12 +14,12 @@ export const PlayingCard = () => {
       <object3D>
         <object3D>
           <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
-            <meshBasicMaterial map={frontTexture} />
+            <meshLambertMaterial map={frontTexture} />
           </RoundedRect>
         </object3D>
         <object3D rotation-y={Math.PI}>
           <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
-            <meshBasicMaterial map={backTexture} />
+            <meshLambertMaterial map={backTexture} />
           </RoundedRect>
         </object3D>
       </object3D>
