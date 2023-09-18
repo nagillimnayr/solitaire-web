@@ -2,6 +2,8 @@ import { useTexture } from '@react-three/drei';
 import { RoundedRect } from '../RoundedRect';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/helpers/constants';
 
+const Z_OFFSET = 1e-4;
+
 export const PlayingCard = () => {
   const [frontTexture, backTexture] = useTexture([
     'textures/kenney/cardClubsA.png',
@@ -17,7 +19,7 @@ export const PlayingCard = () => {
             <meshLambertMaterial map={frontTexture} />
           </RoundedRect>
         </object3D>
-        <object3D rotation-y={Math.PI}>
+        <object3D rotation-y={Math.PI} position-z={Z_OFFSET}>
           <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
             <meshLambertMaterial map={backTexture} />
           </RoundedRect>
