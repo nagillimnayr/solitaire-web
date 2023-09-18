@@ -1,4 +1,5 @@
 import { Background } from './Background';
+import { PileOutline } from './piles/PileOutline';
 import { PlayingCard } from './playing-card/PlayingCard';
 
 export const SolitaireGame = () => {
@@ -6,6 +7,7 @@ export const SolitaireGame = () => {
     <group>
       <Background />
       <PlayingCard />
+      <PileOutline />
     </group>
   );
 };
