@@ -1,21 +1,10 @@
 'use client';
 
+import { SolitaireGame } from '@/components/canvas/SolitaireGame';
 import { PlayingCard } from '@/components/canvas/playing-card/PlayingCard';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
-const Logo = dynamic(
-  () => import('@/components/canvas/Examples').then((mod) => mod.Logo),
-  { ssr: false },
-);
-const Dog = dynamic(
-  () => import('@/components/canvas/Examples').then((mod) => mod.Dog),
-  { ssr: false },
-);
-const Duck = dynamic(
-  () => import('@/components/canvas/Examples').then((mod) => mod.Duck),
-  { ssr: false },
-);
 const View = dynamic(
   () => import('@/components/canvas/View').then((mod) => mod.View),
   {
@@ -57,8 +46,8 @@ export default function Page() {
         <div className='relative m-0 h-full w-full p-0 '>
           <View orbit className='relative h-full w-full'>
             <Suspense fallback={null}>
-              <PlayingCard />
-              <Common color={'#03C03C'} />
+              <SolitaireGame />
+              <Common color={'lightblue'} />
             </Suspense>
           </View>
         </div>
