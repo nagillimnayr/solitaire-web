@@ -30,7 +30,7 @@ export const Tableaus = ({ position }: PositionProps) => {
           key={uuid}
           position-x={START_X_POS + index * CARD_WIDTH_WITH_MARGIN}
         >
-          <TableauPile />
+          <TableauPile index={index} />
         </object3D>
       ))}
     </group>
