@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Background } from './Background';
-import { PileOutline } from './piles/PileOutline';
 import { PlayingCard } from './playing-card/PlayingCard';
 import {
   CARD_WIDTH_HALF,
