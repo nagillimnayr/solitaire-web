@@ -5,4 +5,14 @@ export class StockPileImpl extends PileImpl {
   constructor() {
     super();
   }
+
+  shuffleDeck() {
+    //
+  }
+  dealCards() {
+    //
+  }
+  drawCard() {
+    //
+  }
 }
