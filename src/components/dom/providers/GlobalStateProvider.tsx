@@ -1,21 +1,21 @@
 import { PropsWithChildren, createContext, useMemo } from 'react';
 import { ActorRefFrom } from 'xstate';
-import { StockMachine } from '@/state/stock-machine';
+import { GameMachine } from '@/state/game-machine';
 import { useInterpret } from '@xstate/react';
 
 type GlobalState = {
-  StockPileActor: ActorRefFrom<typeof StockMachine>;
+  GameActor: ActorRefFrom<typeof GameMachine>;
 };
 export const GlobalStateContext = createContext<GlobalState>(null!);
 
 export const GlobalStateProvider = ({ children }: PropsWithChildren) => {
-  const StockPileActor = useInterpret(StockMachine);
+  const GameActor = useInterpret(GameMachine);
 
   const context: GlobalState = useMemo(
     () => ({
-      StockPileActor,
+      GameActor,
     }),
-    [StockPileActor],
+    [GameActor],
   );
 
   return (

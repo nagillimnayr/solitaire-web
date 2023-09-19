@@ -1,21 +1,21 @@
 import { StockPileImpl } from '@/components/canvas/piles/stock-pile/StockPileImpl';
 import { createMachine } from 'xstate';
 
-type StockContext = {
+type GameContext = {
   stockPile: StockPileImpl;
 };
 
-type StockEvents =
+type GameEvents =
   | { type: 'RESTART' }
   | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' };
 
-export const StockMachine = createMachine({
+export const GameMachine = createMachine({
   schema: {
-    context: {} as StockContext,
-    events: {} as StockEvents,
+    context: {} as GameContext,
+    events: {} as GameEvents,
   },
-  id: 'stock-machine',
+  id: 'game-machine',
 
   initial: 'idle',
 
