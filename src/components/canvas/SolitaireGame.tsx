@@ -6,6 +6,10 @@ import { RANKS, SUITS } from '@/helpers/constants';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { StockAndWaste } from './piles/StockAndWaste';
 import { Vector3 } from 'three';
+import { Tableaus } from './piles/Tableaus';
+
+const STOCK_AND_WASTE_POS = new Vector3(-0.4, 0.2, 0);
+const TABLEAUS_POS = new Vector3(0, 0, 0);
 
 export const SolitaireGame = () => {
   const cards = useMemo(() => {
@@ -17,11 +21,13 @@ export const SolitaireGame = () => {
     );
   }, []);
 
-  const stockAndWastePos = useMemo(() => new Vector3(-0.2, 0.1, 0), []);
+  const stockAndWastePos = useMemo(() => new Vector3(-0.4, 0.2, 0), []);
   return (
     <group>
+      <axesHelper />
       <Background />
-      <StockAndWaste position={stockAndWastePos} />
+      <StockAndWaste position={STOCK_AND_WASTE_POS} />
+      <Tableaus position={TABLEAUS_POS} />
       {/* {cards} */}
     </group>
   );
