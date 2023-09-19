@@ -11,7 +11,7 @@ import { PlayingCardImpl } from './playing-card';
 extend({ PlayingCardImpl });
 declare module '@react-three/fiber' {
   interface ThreeElements {
-    playingCard: Object3DNode<PlayingCardImpl, typeof PlayingCardImpl>;
+    playingCardImpl: Object3DNode<PlayingCardImpl, typeof PlayingCardImpl>;
   }
 }
 
@@ -36,7 +36,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
     const radius = CARD_WIDTH * 0.04;
     return (
       <>
-        <playingCard
+        <playingCardImpl
           args={args}
           position-x={START_X + CARD_WIDTH * rank}
           position-y={START_Y - CARD_HEIGHT * suit}
@@ -47,7 +47,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
           <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
             <PlayingCardMaterial frontTexture={frontTexture} />
           </RoundedRect>
-        </playingCard>
+        </playingCardImpl>
       </>
     );
   },
