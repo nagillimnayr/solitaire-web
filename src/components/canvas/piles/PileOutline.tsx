@@ -1,6 +1,8 @@
 import { CARD_HEIGHT, CARD_WIDTH } from '@/helpers/constants';
 import { Path, Shape, ShapeGeometry } from 'three';
 
+const Z_OFFSET = -1e-3 / 2;
+
 const PADDING = CARD_WIDTH * 0.02;
 const WIDTH = CARD_WIDTH + PADDING;
 const HEIGHT = CARD_HEIGHT + PADDING;
@@ -29,7 +31,7 @@ const outlineGeometry = new ShapeGeometry(shape);
 export const PileOutline = () => {
   return (
     <>
-      <mesh geometry={outlineGeometry}></mesh>
+      <mesh geometry={outlineGeometry} position-z={Z_OFFSET}></mesh>
     </>
   );
 };

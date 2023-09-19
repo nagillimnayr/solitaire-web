@@ -20,11 +20,3 @@ export const RANKS = Object.freeze([
   'Q',
   'K',
 ]);
-const textureUrls = new Array<string>();
-SUITS.forEach((suit) => {
-  RANKS.forEach((rank) => {
-    const url = `textures/kenney/card${suit}${rank}.png`;
-    textureUrls.push(url);
-  });
-});
-export const CARD_TEXTURE_URLS = textureUrls.slice();

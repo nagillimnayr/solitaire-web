@@ -48,6 +48,7 @@ const PlayingCardMaterial = forwardRef<
       ref={localRef}
       key={PlayingCardShader.key}
       side={DoubleSide}
+      transparent={true}
       frontTexture={frontTexture}
       backTexture={backTexture}
       attach={'material'}
