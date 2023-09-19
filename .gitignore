@@ -40,3 +40,7 @@ report.*.json
 
 # .vscode Debugging
 .vscode/*-debug-profile
+
+
+# XState
+**/*.typegen.ts
