@@ -4,7 +4,6 @@ import { PlayingCardMaterial } from './playing-card-shader/PlayingCardMaterial';
 import { usePlayingCardTexture } from './usePlayingCardTexture';
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
-import { Object3D } from 'three';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { PlayingCardImpl } from './playing-card';
 
