@@ -6,12 +6,10 @@ export class TableauPileImpl extends Pile {
   constructor(index: number) {
     super();
     this._index = index;
+    this.name = `tableau-${index + 1}`;
   }
   get index() {
     return this._index;
-  }
-  set index(index: number) {
-    this._index = index;
   }
 
   addToPile(card: PlayingCardImpl) {
