@@ -23,7 +23,9 @@
     "three": "^0.154.0",
     "three-stdlib": "^2.24.2",
     "tunnel-rat": "^0.1.2",
-    "xstate": "^4.38.2"
+    "xstate": "^4.38.2",
+    "zustand": "^4.4.1",
+    "zustand-middleware-xstate": "^2.1.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.13",
