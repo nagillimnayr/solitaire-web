@@ -34,4 +34,6 @@ export abstract class Pile extends Mesh {
   constructor() {
     super(outlineGeometry);
   }
+
+  abstract addToPile(card: PlayingCardImpl);
 }
