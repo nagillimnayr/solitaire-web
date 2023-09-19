@@ -1,3 +1,5 @@
+import { MeshBasicMaterial } from 'three';
+
 export const CARD_WIDTH = 63.5e-3; // 63.5mm
 export const CARD_HEIGHT = 88.9e-3; // 88.9mm
 export const CARD_WIDTH_HALF = CARD_WIDTH / 2;
@@ -55,3 +57,5 @@ export const RANK_NAMES = Object.freeze([
   'Queen',
   'King',
 ]);
+
+export const ICON_MATERIAL = new MeshBasicMaterial();
