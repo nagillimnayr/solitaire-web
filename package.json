@@ -10,6 +10,7 @@
     "node": ">=14"
   },
   "dependencies": {
+    "@datastructures-js/stack": "^3.1.4",
     "@ducanh2912/next-pwa": "^9.4.0",
     "@react-three/drei": "^9.80.2",
     "@react-three/fiber": "^8.13.6",
