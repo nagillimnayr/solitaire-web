@@ -1,15 +1,18 @@
-import { useTexture } from '@react-three/drei';
 import { RoundedRect } from '../RoundedRect';
 import { CARD_HEIGHT, CARD_WIDTH, RANKS, SUITS } from '@/helpers/constants';
 import { PlayingCardMaterial } from './playing-card-shader/PlayingCardMaterial';
 import { usePlayingCardTexture } from './usePlayingCardTexture';
-import { PositionProps } from '@/helpers/props';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { makePlayingCardName } from '@/helpers/playing-card-utils';
+import { Object3D } from 'three';
+import { Object3DNode, extend } from '@react-three/fiber';
+import { PlayingCardImpl } from './playing-card';
 
-export enum Suit {
-  Diamonds,
-  Clubs,
-  Hearts,
-  Spades,
+extend({ PlayingCardImpl });
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    playingCard: Object3DNode<PlayingCardImpl, typeof PlayingCardImpl>;
+  }
 }
 
 const START_X = -(RANKS.length * CARD_WIDTH) / 2;
@@ -19,21 +22,36 @@ type PlayingCardProps = {
   rank: number;
   suit: number;
 };
-export const PlayingCard = ({ rank, suit }: PlayingCardProps) => {
-  // const frontTexture = useTexture('textures/kenney/cardClubsA.png');
-  const frontTexture = usePlayingCardTexture(rank, suit);
+const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
+  ({ rank, suit }: PlayingCardProps, ref) => {
+    const frontTexture = usePlayingCardTexture(rank, suit);
 
-  const radius = CARD_WIDTH * 0.0;
-  return (
-    <>
-      <object3D
-        position-x={START_X + CARD_WIDTH * rank}
-        position-y={START_Y - CARD_HEIGHT * suit}
-      >
-        <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
-          <PlayingCardMaterial frontTexture={frontTexture} />
-        </RoundedRect>
-      </object3D>
-    </>
-  );
-};
+    const localRef = useRef<PlayingCardImpl>(null!);
+    useImperativeHandle(ref, () => localRef.current);
+
+    const metaData = useMemo(() => ({ rank, suit }), [rank, suit]);
+    const args: [number, number] = useMemo(() => [rank, suit], [rank, suit]);
+    const name = makePlayingCardName(rank, suit);
+
+    const radius = CARD_WIDTH * 0.04;
+    return (
+      <>
+        <playingCard
+          args={args}
+          position-x={START_X + CARD_WIDTH * rank}
+          position-y={START_Y - CARD_HEIGHT * suit}
+          ref={localRef}
+          name={name}
+          userData={metaData}
+        >
+          <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={radius}>
+            <PlayingCardMaterial frontTexture={frontTexture} />
+          </RoundedRect>
+        </playingCard>
+      </>
+    );
+  },
+);
+
+PlayingCard.displayName = 'PlayingCard';
+export { PlayingCard };
