@@ -1,5 +1,5 @@
 import { PositionProps } from '@/helpers/props';
-import { PileOutline } from './PileOutline';
+import { PileOutline } from '../PileOutline';
 
 type WasteProps = PositionProps & {
   //
@@ -7,7 +7,7 @@ type WasteProps = PositionProps & {
 export const WastePile = ({ position }: WasteProps) => {
   return (
     <object3D position={position}>
-      <PileOutline />
+      <wastePileImpl />
     </object3D>
   );
 };

@@ -1,5 +1,5 @@
 import { PositionProps } from '@/helpers/props';
-import { PileOutline } from './PileOutline';
+import { PileOutline } from '../PileOutline';
 
 type TableauProps = PositionProps & {
   //
@@ -7,7 +7,7 @@ type TableauProps = PositionProps & {
 export const TableauPile = ({ position }: TableauProps) => {
   return (
     <object3D position={position}>
-      <PileOutline />
+      <tableauPileImpl />
     </object3D>
   );
 };
