@@ -1,7 +1,14 @@
 import { PositionProps } from '@/helpers/props';
-import { PileOutline } from '../PileOutline';
 import { StockPileImpl } from './stock-pile';
 import { useRef } from 'react';
+import { Object3DNode, extend } from '@react-three/fiber';
+
+extend({ StockPileImpl });
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    stockPileImpl: Object3DNode<StockPileImpl, typeof StockPileImpl>;
+  }
+}
 
 type StockProps = PositionProps & {
   //

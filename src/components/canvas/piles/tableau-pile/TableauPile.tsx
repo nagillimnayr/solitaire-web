@@ -1,7 +1,14 @@
 import { PositionProps } from '@/helpers/props';
-import { PileOutline } from '../PileOutline';
 import { useRef } from 'react';
 import { TableauPileImpl } from './tableau-pile';
+import { Object3DNode, extend } from '@react-three/fiber';
+
+extend({ TableauPileImpl });
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    tableauPileImpl: Object3DNode<TableauPileImpl, typeof TableauPileImpl>;
+  }
+}
 
 type TableauProps = PositionProps & {
   //

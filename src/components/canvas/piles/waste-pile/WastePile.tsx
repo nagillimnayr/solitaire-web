@@ -1,7 +1,14 @@
 import { PositionProps } from '@/helpers/props';
-import { PileOutline } from '../PileOutline';
 import { WastePileImpl } from './waste-pile';
 import { useRef } from 'react';
+import { Object3DNode, extend } from '@react-three/fiber';
+
+extend({ WastePileImpl });
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    wastePileImpl: Object3DNode<WastePileImpl, typeof WastePileImpl>;
+  }
+}
 
 type WasteProps = PositionProps & {
   //
