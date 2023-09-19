@@ -1,8 +1,8 @@
-import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
 import { StockPileImpl } from '@/components/canvas/piles/stock-pile/StockPileImpl';
-import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauPileImpl';
 import { WastePileImpl } from '@/components/canvas/piles/waste-pile/WastePileImpl';
-import { createMachine } from 'xstate';
+import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauPileImpl';
+import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
+import { assign, createMachine } from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 
@@ -14,6 +14,12 @@ type GameContext = {
 };
 
 type GameEvents =
+  /** Assignment events. */
+  | { type: 'ASSIGN_STOCK'; stockPile: StockPileImpl }
+  | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
+  | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
+  | { type: 'ASSIGN_FOUNDATION'; foundationPile: FoundationPileImpl }
+  /** Game events. */
   | { type: 'RESTART' }
   | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' };
@@ -33,8 +39,32 @@ export const GameMachine = createMachine({
     tableauPiles: new Array<TableauPileImpl>(7),
   },
 
-  initial: 'idle',
+  on: {
+    ASSIGN_STOCK: {
+      actions: [assign({ stockPile: (_, event) => event.stockPile })],
+    },
+    ASSIGN_WASTE: {
+      actions: [assign({ wastePile: (_, event) => event.wastePile })],
+    },
+    ASSIGN_TABLEAU: {
+      actions: [
+        assign({
+          tableauPiles: ({ tableauPiles }, event) => event.tableauPile,
+        }),
+      ],
+    },
+    ASSIGN_FOUNDATION: {
+      actions: [
+        assign({
+          foundationPiles: ({ foundationPiles }, event) => event.foundationPile,
+        }),
+      ],
+    },
+  },
 
+  /** Initial state. */
+  initial: 'idle',
+  /** States. */
   states: {
     idle: {
       on: {
