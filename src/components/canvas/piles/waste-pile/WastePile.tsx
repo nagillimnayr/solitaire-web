@@ -1,5 +1,5 @@
 import { PositionProps } from '@/helpers/props';
-import { WastePileImpl } from './waste-pile';
+import { WastePileImpl } from './WastePileImpl';
 import { useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 

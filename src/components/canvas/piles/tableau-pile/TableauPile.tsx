@@ -1,6 +1,6 @@
 import { PositionProps } from '@/helpers/props';
 import { useRef } from 'react';
-import { TableauPileImpl } from './tableau-pile';
+import { TableauPileImpl } from './TableauPileImpl';
 import { Object3DNode, extend } from '@react-three/fiber';
 
 extend({ TableauPileImpl });

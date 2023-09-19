@@ -5,7 +5,7 @@ import { usePlayingCardTexture } from './usePlayingCardTexture';
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { Object3DNode, extend } from '@react-three/fiber';
-import { PlayingCardImpl } from './playing-card';
+import { PlayingCardImpl } from './PlayingCardImpl';
 
 extend({ PlayingCardImpl });
 declare module '@react-three/fiber' {

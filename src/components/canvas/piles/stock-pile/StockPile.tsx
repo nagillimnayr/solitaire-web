@@ -1,5 +1,5 @@
 import { PositionProps } from '@/helpers/props';
-import { StockPileImpl } from './stock-pile';
+import { StockPileImpl } from './StockPileImpl';
 import { useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 

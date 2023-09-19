@@ -1,7 +1,8 @@
 import { PositionProps } from '@/helpers/props';
-import { FoundationPileImpl } from './foundation-pile';
-import { useRef } from 'react';
+import { FoundationPileImpl } from './FoundationPileImpl';
+import { useMemo, useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
+import { Suit } from '@/helpers/constants';
 
 extend({ FoundationPileImpl });
 declare module '@react-three/fiber' {
@@ -14,13 +15,14 @@ declare module '@react-three/fiber' {
 }
 
 type FoundationProps = PositionProps & {
-  //
+  suit: Suit;
 };
-export const FoundationPile = ({ position }: FoundationProps) => {
+export const FoundationPile = ({ position, suit }: FoundationProps) => {
   const ref = useRef<FoundationPileImpl>(null!);
+  const args: [Suit] = useMemo(() => [suit], [suit]);
   return (
     <object3D position={position}>
-      <foundationPileImpl ref={ref} />
+      <foundationPileImpl ref={ref} args={args} />
     </object3D>
   );
 };
