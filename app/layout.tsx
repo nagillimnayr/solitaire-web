@@ -1,10 +1,11 @@
-import { Layout } from '@/components/dom/Layout'
-import '@/global.css'
+import { Layout } from '@/components/dom/Layout';
+import { GlobalStateProvider } from '@/components/dom/providers/GlobalStateProvider';
+import '@/global.css';
 
 export const metadata = {
   title: 'Next.js + Three.js',
   description: 'A minimal starter for Nextjs + React-three-fiber and Threejs.',
-}
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -16,8 +17,10 @@ export default function RootLayout({ children }) {
       <head />
       <body>
         {/* To avoid FOUT with styled-components wrap Layout with StyledComponentsRegistry https://beta.nextjs.org/docs/styling/css-in-js#styled-components */}
-        <Layout>{children}</Layout>
+        <GlobalStateProvider>
+          <Layout>{children}</Layout>
+        </GlobalStateProvider>
       </body>
     </html>
-  )
+  );
 }
