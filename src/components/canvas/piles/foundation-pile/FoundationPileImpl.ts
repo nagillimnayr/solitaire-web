@@ -9,6 +9,5 @@ export class FoundationPileImpl extends PileImpl {
     super();
     this._suit = suit;
     this.name = `foundation-pile-${SUITS[suit]}`;
-    console.log(this);
   }
 }
