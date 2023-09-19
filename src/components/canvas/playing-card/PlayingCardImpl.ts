@@ -9,6 +9,8 @@ export class PlayingCardImpl extends Object3D {
   private _previousPile: Pile;
   private _currentPile: Pile;
 
+  private _isFaceUp = false;
+
   constructor(rank: number, suit: number) {
     super();
     this._rank = rank;
@@ -16,8 +18,10 @@ export class PlayingCardImpl extends Object3D {
     this.name = makePlayingCardName(rank, suit);
   }
 
-  addToPile(pile: Pile) {
+  addToPile(pile: Pile, faceUp: boolean = false) {
     this._previousPile = this._currentPile;
     this._currentPile = pile;
+    pile.addToPile(this);
+    this._isFaceUp = faceUp;
   }
 }
