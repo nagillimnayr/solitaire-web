@@ -20,3 +20,18 @@ export const RANKS = Object.freeze([
   'Q',
   'K',
 ]);
+export const RANK_NAMES = Object.freeze([
+  'Ace',
+  'Two',
+  'Three',
+  'Four',
+  'Five',
+  'Six',
+  'Seven',
+  'Eight',
+  'Nine',
+  'Ten',
+  'Jack',
+  'Queen',
+  'King',
+]);
