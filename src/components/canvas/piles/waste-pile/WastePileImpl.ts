@@ -5,4 +5,8 @@ export class WastePileImpl extends Pile {
   constructor() {
     super();
   }
+
+  addToPile(card: PlayingCardImpl) {
+    //
+  }
 }

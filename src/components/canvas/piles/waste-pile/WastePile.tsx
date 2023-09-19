@@ -2,6 +2,7 @@ import { PositionProps } from '@/helpers/props';
 import { WastePileImpl } from './WastePileImpl';
 import { useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
+import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 
 extend({ WastePileImpl });
 declare module '@react-three/fiber' {

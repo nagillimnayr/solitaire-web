@@ -2,6 +2,7 @@ import { PositionProps } from '@/helpers/props';
 import { StockPileImpl } from './StockPileImpl';
 import { useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
+import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 
 extend({ StockPileImpl });
 declare module '@react-three/fiber' {
@@ -15,6 +16,7 @@ type StockProps = PositionProps & {
 };
 export const StockPile = ({ position }: StockProps) => {
   const ref = useRef<StockPileImpl>(null!);
+
   return (
     <object3D position={position}>
       <stockPileImpl ref={ref} />

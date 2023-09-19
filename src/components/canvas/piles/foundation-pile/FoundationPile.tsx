@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { ICON_MATERIAL, Suit } from '@/helpers/constants';
 import { Center, Svg } from '@react-three/drei';
+import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 
 extend({ FoundationPileImpl });
 declare module '@react-three/fiber' {
