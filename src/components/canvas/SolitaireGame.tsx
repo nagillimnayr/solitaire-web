@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Background } from './Background';
 import { PlayingCard } from './playing-card/PlayingCard';
 import {
+  CARD_HEIGHT_WITH_MARGIN,
   CARD_WIDTH_HALF,
   CARD_WIDTH_HALF_WITH_MARGIN,
   RANKS,
@@ -15,10 +16,14 @@ import { Foundations } from './piles/Foundations';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
-  0.1,
+  CARD_HEIGHT_WITH_MARGIN,
   0,
 );
-const FOUNDATIONS_POS = new Vector3(CARD_WIDTH_HALF_WITH_MARGIN * 5, 0.1, 0);
+const FOUNDATIONS_POS = new Vector3(
+  CARD_WIDTH_HALF_WITH_MARGIN * 5,
+  CARD_HEIGHT_WITH_MARGIN,
+  0,
+);
 const TABLEAUS_POS = new Vector3(0, 0, 0);
 
 export const SolitaireGame = () => {

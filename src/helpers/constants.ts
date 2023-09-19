@@ -5,9 +5,14 @@ export const CARD_HEIGHT = 88.9e-3; // 88.9mm
 export const CARD_WIDTH_HALF = CARD_WIDTH / 2;
 export const CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
 export const CARD_ASPECT_RATIO = CARD_WIDTH / CARD_HEIGHT;
-export const PILE_X_MARGIN = CARD_WIDTH * 0.1; // X-margin on either side of piles.
+
+export const PILE_X_MARGIN = CARD_WIDTH * 0.1; // X-margin around piles.
+export const PILE_Y_MARGIN = CARD_HEIGHT * 0.1; // Y-margin around piles.
+
 export const CARD_WIDTH_WITH_MARGIN = CARD_WIDTH + PILE_X_MARGIN * 2;
 export const CARD_WIDTH_HALF_WITH_MARGIN = CARD_WIDTH_HALF + PILE_X_MARGIN;
+export const CARD_HEIGHT_WITH_MARGIN = CARD_HEIGHT + PILE_Y_MARGIN * 2;
+export const CARD_HEIGHT_HALF_WITH_MARGIN = CARD_HEIGHT_HALF + PILE_Y_MARGIN;
 
 export const BACKGROUND_COLOR = '#03C03C';
 
