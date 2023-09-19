@@ -1,13 +1,13 @@
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { Object3D } from 'three';
-import { PileImpl } from '../piles/PileImpl';
+import { Pile } from '../piles/Pile';
 
 export class PlayingCardImpl extends Object3D {
   private _rank: number;
   private _suit: number;
 
-  private _previousPile: PileImpl;
-  private _currentPile: PileImpl;
+  private _previousPile: Pile;
+  private _currentPile: Pile;
 
   constructor(rank: number, suit: number) {
     super();
@@ -16,7 +16,7 @@ export class PlayingCardImpl extends Object3D {
     this.name = makePlayingCardName(rank, suit);
   }
 
-  addToPile(pile: PileImpl) {
+  addToPile(pile: Pile) {
     this._previousPile = this._currentPile;
     this._currentPile = pile;
   }

@@ -28,7 +28,7 @@ shape.holes.push(hole);
 
 const outlineGeometry = new ShapeGeometry(shape);
 
-export class PileImpl extends Mesh {
+export abstract class Pile extends Mesh {
   protected _pile: Stack<PlayingCardImpl> = new Stack<PlayingCardImpl>();
 
   constructor() {

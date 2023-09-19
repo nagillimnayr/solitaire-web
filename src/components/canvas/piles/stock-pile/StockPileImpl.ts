@@ -1,7 +1,7 @@
-import { PileImpl } from '@/components/canvas/piles/PileImpl';
+import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
 
-export class StockPileImpl extends PileImpl {
+export class StockPileImpl extends Pile {
   constructor() {
     super();
   }
@@ -14,5 +14,8 @@ export class StockPileImpl extends PileImpl {
   }
   drawCard() {
     //
+  }
+  returnAllCardsToDeck() {
+    this.dispatchEvent({ type: 'RETURN_ALL_CARDS' });
   }
 }

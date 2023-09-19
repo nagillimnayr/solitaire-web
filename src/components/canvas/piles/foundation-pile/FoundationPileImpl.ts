@@ -1,8 +1,8 @@
-import { PileImpl } from '@/components/canvas/piles/PileImpl';
+import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
 import { SUITS, Suit } from '@/helpers/constants';
 
-export class FoundationPileImpl extends PileImpl {
+export class FoundationPileImpl extends Pile {
   private _suit: Suit;
 
   constructor(suit: Suit) {

@@ -1,7 +1,7 @@
-import { PileImpl } from '@/components/canvas/piles/PileImpl';
+import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
 
-export class WastePileImpl extends PileImpl {
+export class WastePileImpl extends Pile {
   constructor() {
     super();
   }
