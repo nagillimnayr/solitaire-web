@@ -29,8 +29,8 @@ export const GameMachine = createMachine({
   context: {
     stockPile: null!,
     wastePile: null!,
-    foundationPiles: null!,
-    tableauPiles: null!,
+    foundationPiles: new Array<FoundationPileImpl>(4),
+    tableauPiles: new Array<TableauPileImpl>(7),
   },
 
   initial: 'idle',
