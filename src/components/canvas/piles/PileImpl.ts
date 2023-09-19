@@ -1,6 +1,6 @@
 import { Stack } from '@datastructures-js/stack';
 import { Mesh, Object3D, Path, Shape, ShapeGeometry } from 'three';
-import { PlayingCardImpl } from '../playing-card/playing-card';
+import { PlayingCardImpl } from '../playing-card/PlayingCardImpl';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/helpers/constants';
 
 const PADDING = CARD_WIDTH * 0.02;

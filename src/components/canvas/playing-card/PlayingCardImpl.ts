@@ -1,6 +1,6 @@
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { Object3D } from 'three';
-import { PileImpl } from '../piles/pile';
+import { PileImpl } from '../piles/PileImpl';
 
 export class PlayingCardImpl extends Object3D {
   private _rank: number;
