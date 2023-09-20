@@ -8,7 +8,7 @@ export class StockPileImpl extends Pile {
   }
 
   addToPile(card: PlayingCardImpl) {
-    //
+    this._pile.push(card);
   }
 
   shuffleDeck() {
