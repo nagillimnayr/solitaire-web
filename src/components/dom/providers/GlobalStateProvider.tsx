@@ -1,3 +1,4 @@
+'use client';
 import { PropsWithChildren, createContext, useMemo } from 'react';
 import { ActorRefFrom } from 'xstate';
 import { GameMachine } from '@/state/game-machine';
