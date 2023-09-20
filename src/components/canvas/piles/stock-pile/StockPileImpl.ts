@@ -18,7 +18,8 @@ export class StockPileImpl extends Pile {
     //
   }
   drawCard() {
-    //
+    if (this._pile.isEmpty()) return null;
+    return this._pile.pop();
   }
   returnAllCardsToDeck() {
     this.dispatchEvent({ type: 'RETURN_ALL_CARDS' });
