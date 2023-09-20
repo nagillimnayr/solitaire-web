@@ -49,14 +49,22 @@ export const GameMachine = createMachine({
     ASSIGN_TABLEAU: {
       actions: [
         assign({
-          tableauPiles: ({ tableauPiles }, event) => event.tableauPile,
+          tableauPiles: ({ tableauPiles }, { tableauPile }) => {
+            const newArray = tableauPiles.slice();
+            newArray[tableauPile.index] = tableauPile;
+            return newArray;
+          },
         }),
       ],
     },
     ASSIGN_FOUNDATION: {
       actions: [
         assign({
-          foundationPiles: ({ foundationPiles }, event) => event.foundationPile,
+          foundationPiles: ({ foundationPiles }, { foundationPile }) => {
+            const newArray = foundationPiles.slice();
+            newArray[foundationPile.suit] = foundationPile;
+            return newArray;
+          },
         }),
       ],
     },
