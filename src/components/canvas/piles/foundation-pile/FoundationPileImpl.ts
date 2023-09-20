@@ -16,6 +16,6 @@ export class FoundationPileImpl extends Pile {
   }
 
   addToPile(card: PlayingCardImpl) {
-    //
+    this._pile.push(card);
   }
 }

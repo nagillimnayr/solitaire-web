@@ -8,6 +8,6 @@ export class WastePileImpl extends Pile {
   }
 
   addToPile(card: PlayingCardImpl) {
-    //
+    this._pile.push(card);
   }
 }
