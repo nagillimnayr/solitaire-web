@@ -87,30 +87,40 @@ export const GameMachine = createMachine(
       idle: {
         on: {
           RESTART: {
+            actions: ['logEvent'],
             target: 'restarting',
           },
           DEAL_CARDS: {
+            actions: ['logEvent'],
             target: 'dealing',
           },
           DRAW_CARD: {
+            actions: ['logEvent'],
             target: 'drawing',
           },
         },
       },
       restarting: {
         //
+        always: [{ target: 'idle' }],
       },
       dealing: {
         //
+        always: [{ target: 'idle' }],
       },
       drawing: {
-        //
+        entry: ['drawCard'],
+        always: [{ target: 'idle' }],
       },
     },
   },
   {
     actions: {
       logEvent: log((_, event) => event),
+      drawCard: ({ stockPile, wastePile }) => {
+        const card = stockPile.drawCard();
+        card.addToPile(wastePile, true);
+      },
     },
   },
 );
