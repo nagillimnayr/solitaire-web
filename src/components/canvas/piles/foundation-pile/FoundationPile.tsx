@@ -1,6 +1,6 @@
 import { PositionProps } from '@/helpers/props';
 import { FoundationPileImpl } from './FoundationPileImpl';
-import { useMemo, useRef } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { ICON_MATERIAL, Suit } from '@/helpers/constants';
 import { Center, Svg } from '@react-three/drei';
@@ -28,7 +28,16 @@ type FoundationProps = PositionProps & {
   suit: Suit;
 };
 export const FoundationPile = ({ position, suit }: FoundationProps) => {
+  const { GameActor } = useContext(GlobalStateContext);
   const ref = useRef<FoundationPileImpl>(null!);
+
+  /** Assign foundation pile in global context. */
+  useEffect(() => {
+    const foundationPile = ref.current;
+    if (!foundationPile) return;
+    GameActor.send({ type: 'ASSIGN_FOUNDATION', foundationPile });
+  }, [GameActor]);
+
   const args: [Suit] = useMemo(() => [suit], [suit]);
   return (
     <object3D position={position}>
