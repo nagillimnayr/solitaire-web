@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { Background } from './Background';
 import { PlayingCard } from './playing-card/PlayingCard';
 import {
@@ -13,6 +13,7 @@ import { StockAndWaste } from './piles/StockAndWaste';
 import { Vector3 } from 'three';
 import { Tableaus } from './piles/Tableaus';
 import { Foundations } from './piles/Foundations';
+import { GlobalStateContext } from '../dom/providers/GlobalStateProvider';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -27,6 +28,7 @@ const FOUNDATIONS_POS = new Vector3(
 const TABLEAUS_POS = new Vector3(0, 0, 0);
 
 export const SolitaireGame = () => {
+  const { GameActor } = useContext(GlobalStateContext);
   const cards = useMemo(() => {
     return Object.keys(SUITS).map((suit, suitIndex) =>
       RANKS.map((rank, rankIndex) => {
@@ -35,6 +37,10 @@ export const SolitaireGame = () => {
       }),
     );
   }, []);
+
+  useEffect(() => {
+    GameActor.send({ type: 'RESTART' });
+  }, [GameActor]);
 
   return (
     <group>
