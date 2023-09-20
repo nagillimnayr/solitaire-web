@@ -30,10 +30,8 @@ export const SolitaireGame = () => {
   const cards = useMemo(() => {
     return Object.keys(SUITS).map((suit, suitIndex) =>
       RANKS.map((rank, rankIndex) => {
-        const key = makePlayingCardName(Number(rank), Number(suit));
-        return (
-          <PlayingCard key={key} rank={Number(rank)} suit={Number(suit)} />
-        );
+        const key = makePlayingCardName(rankIndex, Number(suit));
+        return <PlayingCard key={key} rank={rankIndex} suit={Number(suit)} />;
       }),
     );
   }, []);
@@ -45,7 +43,7 @@ export const SolitaireGame = () => {
       <StockAndWaste position={STOCK_AND_WASTE_POS} />
       <Foundations position={FOUNDATIONS_POS} />
       <Tableaus position={TABLEAUS_POS} />
-      {/* {cards} */}
+      {cards}
     </group>
   );
 };
