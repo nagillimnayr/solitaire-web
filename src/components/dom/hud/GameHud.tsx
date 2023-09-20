@@ -1,6 +1,7 @@
 import { Html } from '@react-three/drei';
 import { RestartButton } from './RestartButton';
 import { cn } from '@/helpers/cn';
+import { DrawButton } from './DrawButton';
 
 export const GameHud = () => {
   return (
@@ -14,6 +15,7 @@ export const GameHud = () => {
       >
         <div className='pointer-events-auto col-start-2 h-fit w-fit'>
           <RestartButton />
+          <DrawButton />
         </div>
       </div>
     </>
