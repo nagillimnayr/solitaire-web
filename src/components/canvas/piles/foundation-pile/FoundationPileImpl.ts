@@ -11,6 +11,10 @@ export class FoundationPileImpl extends Pile {
     this.name = `foundation-pile-${SUITS[suit]}`;
   }
 
+  get suit() {
+    return this._suit;
+  }
+
   addToPile(card: PlayingCardImpl) {
     //
   }
