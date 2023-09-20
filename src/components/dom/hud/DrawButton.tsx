@@ -8,7 +8,6 @@ export const DrawButton = () => {
   const { GameActor } = useContext(GlobalStateContext);
 
   const handleClick = useCallback(() => {
-    console.log('draw');
     GameActor.send({ type: 'DRAW_CARD' });
   }, [GameActor]);
 
