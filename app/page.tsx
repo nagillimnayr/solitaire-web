@@ -2,6 +2,7 @@
 
 import { SolitaireGame } from '@/components/canvas/SolitaireGame';
 import { PlayingCard } from '@/components/canvas/playing-card/PlayingCard';
+import { GameHud } from '@/components/dom/hud/GameHud';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
@@ -44,6 +45,7 @@ export default function Page() {
     <>
       <div className='mx-auto flex h-screen w-full flex-col flex-wrap items-center p-4 '>
         <div className='relative m-0 h-full w-full p-0 '>
+          <GameHud />
           <View orbit className='relative h-full w-full'>
             <Suspense fallback={null}>
               <SolitaireGame />
