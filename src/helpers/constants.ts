@@ -64,3 +64,9 @@ export const RANK_NAMES = Object.freeze([
 ]);
 
 export const ICON_MATERIAL = new MeshBasicMaterial();
+
+export const PI = Math.PI;
+export const PI_OVER_2 = PI / 2;
+export const PI_OVER_3 = PI / 3;
+export const PI_OVER_4 = PI / 4;
+export const PI_OVER_6 = PI / 6;
