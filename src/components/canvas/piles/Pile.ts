@@ -36,4 +36,8 @@ export abstract class Pile extends Mesh {
   }
 
   abstract addToPile(card: PlayingCardImpl);
+
+  get count() {
+    return this._pile.size();
+  }
 }
