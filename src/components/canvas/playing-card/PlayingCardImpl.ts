@@ -34,15 +34,17 @@ export class PlayingCardImpl extends Object3D {
   }
 
   addToPile(pile: Pile, faceUp: boolean = false) {
+    // Don't add to pile if already in pile.
+    if (Object.is(pile, this._currentPile)) return;
     this._previousPile = this._currentPile;
     this._currentPile = pile;
+
     pile.addToPile(this);
+
     faceUp ? this.flipFaceUp() : this.flipFaceDown();
 
     pile.getWorldPosition(_pos);
-    this.worldToLocal(_pos);
     _pos.z += Z_OFFSET * pile.count;
-
     this.moveTo(_pos);
   }
 
@@ -52,10 +54,10 @@ export class PlayingCardImpl extends Object3D {
 
   flipFaceUp() {
     this._isFaceUp = true;
-    this._targetRotation.y = PI;
+    this._targetRotation.y = 0;
   }
   flipFaceDown() {
     this._isFaceUp = false;
-    this._targetRotation.y = 0;
+    this._targetRotation.y = PI;
   }
 }
