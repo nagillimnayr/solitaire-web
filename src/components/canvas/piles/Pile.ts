@@ -40,4 +40,8 @@ export abstract class Pile extends Mesh {
   get count() {
     return this._pile.size();
   }
+
+  isEmpty() {
+    return this._pile.isEmpty();
+  }
 }
