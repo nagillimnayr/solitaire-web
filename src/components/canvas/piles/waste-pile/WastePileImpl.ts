@@ -4,6 +4,7 @@ import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImp
 export class WastePileImpl extends Pile {
   constructor() {
     super();
+    this.name = `stock-pile`;
   }
 
   addToPile(card: PlayingCardImpl) {
