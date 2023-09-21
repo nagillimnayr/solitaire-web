@@ -6,13 +6,31 @@ import { ContextFrom, assign, choose, createMachine, log, raise } from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
-import { NUMBER_OF_CARDS } from '@/helpers/constants';
+import {
+  CARD_WIDTH_WITH_MARGIN,
+  NUMBER_OF_CARDS,
+  Z_OFFSET,
+} from '@/helpers/constants';
+import { Vector3 } from 'three';
+import { randInt } from 'three/src/math/MathUtils';
+
+const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
+const _pos1 = new Vector3();
+const _pos2 = new Vector3();
+
+/** Helper for shuffling the deck. */
+type SplitPiles = {
+  pile1: PlayingCardImpl[];
+  pile2: PlayingCardImpl[];
+};
 
 type GameContext = {
   stockPile: StockPileImpl;
   wastePile: WastePileImpl;
   foundationPiles: FoundationPileImpl[];
   tableauPiles: TableauPileImpl[];
+
+  splitPiles: SplitPiles; // Helper for shuffling the deck.
 };
 
 type GameEvents =
@@ -44,6 +62,11 @@ export const GameMachine = createMachine(
       wastePile: null!,
       foundationPiles: new Array<FoundationPileImpl>(4),
       tableauPiles: new Array<TableauPileImpl>(7),
+
+      splitPiles: {
+        pile1: new Array<PlayingCardImpl>(),
+        pile2: new Array<PlayingCardImpl>(),
+      },
     },
 
     on: {
@@ -123,7 +146,7 @@ export const GameMachine = createMachine(
       restarting: {
         after: {
           /** If stock pile is full, we're done returning the cards. Transition to dealing. */
-          1000: { cond: 'stockIsFull', target: 'dealing' },
+          1000: { cond: 'stockIsFull', target: 'splittingDeck' },
           50: [
             {
               /** Return cards from tableaus. */
@@ -144,6 +167,35 @@ export const GameMachine = createMachine(
               target: 'restarting',
             },
           ],
+        },
+      },
+      splittingDeck: {
+        after: {
+          1000: {
+            /** Once the stockPile is empty, transition to shuffling. */
+            cond: 'stockIsEmpty',
+            target: 'shuffling',
+          },
+          50: {
+            cond: 'stockNotEmpty',
+            // cond: ({ stockPile }) => stockPile.count > HALF_DECK_SIZE,
+            /** Take cards from the stockPile and add them to splitPiles.*/
+            actions: ['splitDeck'],
+            target: 'splittingDeck',
+          },
+        },
+      },
+
+      shuffling: {
+        after: {
+          /** When stock is full again, transition to dealing. */
+          1000: { cond: 'stockIsFull', target: 'dealing' },
+          CARD_DELAY: {
+            cond: 'stockNotFull',
+            /** Add the cards back to the stockPile in a random order.*/
+            actions: ['shuffleDeck'],
+            target: 'shuffling',
+          },
         },
       },
       dealing: {
@@ -210,6 +262,57 @@ export const GameMachine = createMachine(
         /** Add card to stock pile. */
         card.addToPile(stockPile);
       },
+      splitDeck: ({ stockPile, splitPiles }) => {
+        /** Move two cards from stockPile to splitPiles. */
+        const { pile1, pile2 } = splitPiles;
+        const card1 = stockPile.drawCard();
+        const card2 = stockPile.drawCard();
+
+        stockPile.getWorldPosition(_pos1);
+        stockPile.getWorldPosition(_pos2);
+        _pos1.x -= CARD_WIDTH_WITH_MARGIN;
+        _pos1.z += pile1.length * Z_OFFSET;
+        _pos2.z += pile2.length * Z_OFFSET;
+
+        /** Randomize which card goes to which pile. */
+        const order = randInt(0, 1);
+        if (order === 1) {
+          pile1.push(card1);
+          card1.moveTo(_pos1);
+
+          pile2.push(card2);
+          card2.moveTo(_pos2);
+        } else {
+          pile1.push(card2);
+          card2.moveTo(_pos1);
+
+          pile2.push(card1);
+          card1.moveTo(_pos2);
+        }
+      },
+      shuffleDeck: ({ stockPile, splitPiles }) => {
+        const { pile1, pile2 } = splitPiles;
+
+        /** Randomly select a card from each split pile. */
+        const index1 = randInt(0, pile1.length - 1);
+        const index2 = randInt(0, pile2.length - 1);
+        const card1 = pile1[index1];
+        const card2 = pile2[index2];
+
+        /** And the cards to stockPile and randomize which one gets added first. */
+        const order = randInt(0, 1);
+        if (order === 0) {
+          card1.addToPile(stockPile);
+          card2.addToPile(stockPile);
+        } else {
+          card2.addToPile(stockPile);
+          card1.addToPile(stockPile);
+        }
+
+        /** Remove the cards from split piles. */
+        pile1.splice(index1, 1);
+        pile2.splice(index2, 1);
+      },
       dealCard: ({ stockPile, tableauPiles }) => {
         for (let i = 0; i < tableauPiles.length; ++i) {
           const tableauPile = tableauPiles[i];
@@ -271,7 +374,7 @@ export const GameMachine = createMachine(
     guards: {
       /** Stock. */
       stockIsFull: ({ stockPile }) => stockPile.count === NUMBER_OF_CARDS,
-      // stockNotFull: ({ stockPile }) => stockPile.count !== NUMBER_OF_CARDS,
+      stockNotFull: ({ stockPile }) => stockPile.count !== NUMBER_OF_CARDS,
       stockIsEmpty: ({ stockPile }) => stockPile.isEmpty(),
       stockNotEmpty: ({ stockPile }) => !stockPile.isEmpty(),
 

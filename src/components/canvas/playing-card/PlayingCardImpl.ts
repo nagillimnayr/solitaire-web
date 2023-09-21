@@ -61,10 +61,10 @@ export class PlayingCardImpl extends Object3D {
   }
 
   addToPile(pile: Pile, faceUp: boolean = false) {
-    // Don't add to pile if already in pile.
-    if (Object.is(pile, this._currentPile)) return;
-    this._previousPile = this._currentPile;
-    this._currentPile = pile;
+    if (!Object.is(pile, this._currentPile)) {
+      this._previousPile = this._currentPile;
+      this._currentPile = pile;
+    }
 
     faceUp ? this.flipFaceUp() : this.flipFaceDown();
 
