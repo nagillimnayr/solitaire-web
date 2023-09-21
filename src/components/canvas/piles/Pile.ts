@@ -35,7 +35,7 @@ export abstract class Pile extends Mesh {
     super(outlineGeometry);
   }
 
-  abstract addToPile(card: PlayingCardImpl);
+  abstract addToPile(card: PlayingCardImpl): Promise<never>;
 
   get count() {
     return this._pile.size();

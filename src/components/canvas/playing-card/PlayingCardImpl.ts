@@ -1,13 +1,11 @@
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { Euler, Object3D, Vector3 } from 'three';
 import { Pile } from '../piles/Pile';
-import { PI } from '@/helpers/constants';
-import { damp3, dampE } from 'maath/easing';
-
-const SMOOTH_TIME = 0.25;
-const Z_OFFSET = 1e-4;
+import { PI, SMOOTH_TIME, Z_OFFSET } from '@/helpers/constants';
+import { damp, damp3, dampE } from 'maath/easing';
 
 const _pos = new Vector3();
+const DISTANCE_THRESHOLD = 0.001;
 
 export class PlayingCardImpl extends Object3D {
   private _rank: number;
@@ -30,6 +28,10 @@ export class PlayingCardImpl extends Object3D {
     this.name = makePlayingCardName(rank, suit);
   }
 
+  get currentPile() {
+    return this._currentPile;
+  }
+
   update(deltaTime) {
     const isMoving = damp3(
       this.position,
@@ -37,14 +39,15 @@ export class PlayingCardImpl extends Object3D {
       SMOOTH_TIME,
       deltaTime,
     );
+
     const isRotating = dampE(
       this.rotation,
       this._targetRotation,
       SMOOTH_TIME,
       deltaTime,
     );
-    if (this._isMoving && !isMoving) {
-      this.dispatchEvent({ type: 'rest' });
+    if (this.position.distanceTo(this._targetPos) < DISTANCE_THRESHOLD) {
+      this.dispatchEvent({ type: 'REST' });
     }
   }
 
@@ -54,28 +57,27 @@ export class PlayingCardImpl extends Object3D {
     this._previousPile = this._currentPile;
     this._currentPile = pile;
 
-    pile.addToPile(this);
-
     faceUp ? this.flipFaceUp() : this.flipFaceDown();
 
-    pile.getWorldPosition(_pos);
-    _pos.z += Z_OFFSET * pile.count;
-    return this.moveTo(_pos);
+    // pile.getWorldPosition(_pos);
+    // _pos.z += Z_OFFSET * pile.count;
+    return pile.addToPile(this);
   }
 
   moveTo(newPos: Vector3) {
-    this.dispatchEvent({ type: 'start-move' });
+    this.dispatchEvent({ type: 'START_MOVE' });
     this._targetPos.copy(newPos);
     this._isMoving = true;
 
     // Create promise that will be resolved when the 'rest' event is triggered.
     return new Promise<never>((resolve) => {
       const onResolve = () => {
-        this.removeEventListener('rest', onResolve);
+        this.removeEventListener('REST', onResolve);
         this._isMoving = false;
         resolve(null);
       };
-      this.addEventListener('rest', onResolve);
+
+      this.addEventListener('REST', onResolve);
     });
   }
 

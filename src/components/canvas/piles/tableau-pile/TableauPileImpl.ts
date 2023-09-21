@@ -1,5 +1,9 @@
 import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
+import { Vector3 } from 'three';
+import { lerp } from 'three/src/math/MathUtils';
+
+const _pos = new Vector3();
 
 export class TableauPileImpl extends Pile {
   private _index: number;
