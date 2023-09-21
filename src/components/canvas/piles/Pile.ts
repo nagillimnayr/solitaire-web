@@ -44,6 +44,9 @@ export abstract class Pile extends Mesh {
   isEmpty() {
     return this._pile.isEmpty();
   }
+  peek() {
+    return this._pile.isEmpty() ? null : this._pile.peek();
+  }
   drawCard() {
     if (this._pile.isEmpty()) return null;
     return this._pile.pop();
