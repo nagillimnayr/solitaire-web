@@ -2,15 +2,19 @@ import { StockPileImpl } from '@/components/canvas/piles/stock-pile/StockPileImp
 import { WastePileImpl } from '@/components/canvas/piles/waste-pile/WastePileImpl';
 import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauPileImpl';
 import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
-import { assign, createMachine, log } from 'xstate';
+import { assign, choose, createMachine, log, raise } from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
+import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
+import { WastePile } from '../components/canvas/piles/waste-pile/WastePile';
 
 type GameContext = {
   stockPile: StockPileImpl;
   wastePile: WastePileImpl;
   foundationPiles: FoundationPileImpl[];
   tableauPiles: TableauPileImpl[];
+
+  numCardsMoving: number;
 };
 
 type GameEvents =
@@ -19,8 +23,11 @@ type GameEvents =
   | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
   | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'ASSIGN_FOUNDATION'; foundationPile: FoundationPileImpl }
+  | { type: 'INCREMENT_NUM_CARDS_MOVING' }
+  | { type: 'DECREMENT_NUM_CARDS_MOVING' }
   /** Game events. */
   | { type: 'RESTART' }
+  | { type: 'RETURN_WASTE' }
   | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' };
 
@@ -39,6 +46,7 @@ export const GameMachine = createMachine(
       wastePile: null!,
       foundationPiles: new Array<FoundationPileImpl>(4),
       tableauPiles: new Array<TableauPileImpl>(7),
+      numCardsMoving: 0,
     },
 
     on: {
@@ -78,6 +86,23 @@ export const GameMachine = createMachine(
           }),
         ],
       },
+      INCREMENT_NUM_CARDS_MOVING: {
+        actions: [
+          'logEvent',
+          assign({
+            numCardsMoving: ({ numCardsMoving }) => numCardsMoving + 1,
+          }),
+        ],
+      },
+      DECREMENT_NUM_CARDS_MOVING: {
+        cond: ({ numCardsMoving }) => numCardsMoving > 0,
+        actions: [
+          'logEvent',
+          assign({
+            numCardsMoving: ({ numCardsMoving }) => numCardsMoving - 1,
+          }),
+        ],
+      },
     },
 
     /** Initial state. */
@@ -89,6 +114,10 @@ export const GameMachine = createMachine(
           RESTART: {
             actions: ['logEvent'],
             target: 'restarting',
+          },
+          RETURN_WASTE: {
+            actions: ['logEvent'],
+            target: 'returningWaste',
           },
           DEAL_CARDS: {
             actions: ['logEvent'],
@@ -109,18 +138,54 @@ export const GameMachine = createMachine(
         always: [{ target: 'idle' }],
       },
       drawing: {
-        entry: ['drawCard'],
-        always: [{ target: 'idle' }],
+        /** If stock is empty, return cards from waste pile.  */
+        always: {
+          cond: ({ stockPile }) => stockPile.isEmpty(),
+          target: 'returningWaste',
+        },
+
+        invoke: {
+          src: 'drawCard',
+          onDone: { target: 'idle' },
+        },
+      },
+      returningWaste: {
+        /** If waste pile is empty, transition to idle. */
+        always: [
+          { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
+        ],
+        after: {
+          CARD_DELAY: {
+            actions: ['returnWasteToDeck'],
+            /** Recursively self-transition after delay. */
+            target: 'returningWaste',
+          },
+        },
       },
     },
   },
   {
     actions: {
       logEvent: log((_, event) => event),
+      returnWasteToDeck: ({ stockPile, wastePile }) => {
+        const card = wastePile.drawCard();
+        card.addToPile(stockPile, false);
+      },
+    },
+    delays: {
+      CARD_DELAY: (context, event) => {
+        return 25;
+      },
+    },
+    services: {
       drawCard: ({ stockPile, wastePile }) => {
         const card = stockPile.drawCard();
-        card.addToPile(wastePile, true);
+        return card.addToPile(wastePile, true);
       },
+      // returnWasteToDeck: ({ stockPile, wastePile }) => {
+      //   const card = wastePile.drawCard();
+      //   return card.addToPile(stockPile, false);
+      // },
     },
   },
 );
