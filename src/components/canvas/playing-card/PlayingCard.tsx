@@ -44,15 +44,8 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
     useImperativeHandle(ref, () => localRef.current);
 
     useEffect(() => {
-      const subscription = GameActor.subscribe((state) => {
-        if (state.event.type !== 'RESTART') return;
-        const card = localRef.current;
-        const { stockPile } = state.context;
-        card.addToPile(stockPile);
-      });
-
-      // Cleanup.
-      return () => subscription.unsubscribe();
+      const card = localRef.current;
+      GameActor.send({ type: 'INIT_CARD', card });
     }, [GameActor]);
 
     useFrame((state, delta) => {

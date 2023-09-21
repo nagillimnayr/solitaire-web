@@ -21,6 +21,7 @@ type GameEvents =
   | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
   | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'ASSIGN_FOUNDATION'; foundationPile: FoundationPileImpl }
+  | { type: 'INIT_CARD'; card: PlayingCardImpl }
 
   /** Game events. */
   | { type: 'RESTART' }
@@ -81,6 +82,9 @@ export const GameMachine = createMachine(
             },
           }),
         ],
+      },
+      INIT_CARD: {
+        actions: ['initCard'],
       },
     },
 
@@ -202,6 +206,10 @@ export const GameMachine = createMachine(
   {
     actions: {
       logEvent: log((_, event) => event),
+      initCard: ({ stockPile }, { card }) => {
+        /** Add card to stock pile. */
+        card.addToPile(stockPile);
+      },
       dealCard: ({ stockPile, tableauPiles }) => {
         for (let i = 0; i < tableauPiles.length; ++i) {
           const tableauPile = tableauPiles[i];
@@ -221,12 +229,6 @@ export const GameMachine = createMachine(
             return;
           }
         }
-        // for (let i = 0; i < tableauPiles.length; ++i) {
-        //   if (tableauPiles[i].needsFlipping) {
-        //     tableauPiles[i].flipTopCard();
-        //     return;
-        //   }
-        // }
       },
       returnWaste: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
@@ -242,6 +244,8 @@ export const GameMachine = createMachine(
       },
       returnFoundation: ({ stockPile, foundationPiles }) => {
         for (const foundationPile of foundationPiles) {
+          const card = foundationPile.drawCard();
+          card.addToPile(stockPile, false);
         }
       },
     },
