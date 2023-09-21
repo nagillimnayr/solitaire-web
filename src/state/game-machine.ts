@@ -109,7 +109,6 @@ export const GameMachine = createMachine(
             },
             {
               actions: ['logEvent'],
-
               target: 'drawing',
             },
           ],
@@ -125,18 +124,36 @@ export const GameMachine = createMachine(
         },
       },
       dealing: {
-        //
-        always: [
-          {
-            target: 'idle',
-            cond: ({ tableauPiles }) => tableauPiles[6].count >= 7,
-          },
-        ],
         after: {
-          CARD_DELAY: {
-            actions: ['dealCard'],
+          CARD_DELAY: [
+            {
+              /** If rightmost tableau has 7 cards, we're done dealing. Transition to flipping top cards of each tableau. */
+              cond: ({ tableauPiles }) => tableauPiles[6].count >= 7,
+              target: 'flippingTableaus',
+            },
+            {
+              actions: ['dealCard'],
+              /** Recursively self-transition after delay. */
+              target: 'dealing',
+            },
+          ],
+        },
+      },
+      flippingTableaus: {
+        after: {
+          500: {
+            /** Only execute if rightmost hasn't been flipped. */
+            cond: ({ tableauPiles }) => tableauPiles[6].needsFlipping,
+            /** Flip next tableau. */
+            actions: ['flipTableau', log('Flip Tableau!')],
             /** Recursively self-transition after delay. */
-            target: 'dealing',
+            target: 'flippingTableaus',
+          },
+          1000: {
+            /** If rightmost tableau is face-up, transition to idle. */
+            // cond: ({ tableauPiles }) => !tableauPiles[6].needsFlipping,
+            actions: [log('Done flipping tableaus.')],
+            target: 'idle',
           },
         },
       },
@@ -153,11 +170,12 @@ export const GameMachine = createMachine(
         },
       },
       returningWaste: {
-        /** If waste pile is empty, transition to idle. */
-        always: [
-          { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
-        ],
+        // always: [
+        //   { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
+        // ],
         after: {
+          /** If waste pile is empty, transition to idle. */
+          500: { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
           CARD_DELAY: {
             actions: ['returnWasteToDeck'],
             /** Recursively self-transition after delay. */
@@ -180,6 +198,15 @@ export const GameMachine = createMachine(
           }
         }
       },
+      flipTableau: ({ tableauPiles }) => {
+        /** Iterate through tableaus and flip the first one that isn't face up. */
+        for (let i = 0; i < tableauPiles.length; ++i) {
+          if (tableauPiles[i].needsFlipping) {
+            tableauPiles[i].flipTopCard();
+            return;
+          }
+        }
+      },
       returnWasteToDeck: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
         card.addToPile(stockPile, false);
@@ -187,7 +214,7 @@ export const GameMachine = createMachine(
     },
     delays: {
       CARD_DELAY: (context, event) => {
-        return 25;
+        return 50;
       },
       RESTART_DELAY: 500,
     },
@@ -200,6 +227,9 @@ export const GameMachine = createMachine(
       //   const card = wastePile.drawCard();
       //   return card.addToPile(stockPile, false);
       // },
+    },
+    guards: {
+      /**  */
     },
   },
 );
