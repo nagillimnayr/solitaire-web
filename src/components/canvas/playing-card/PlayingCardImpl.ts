@@ -28,6 +28,9 @@ export class PlayingCardImpl extends Object3D {
     this.name = makePlayingCardName(rank, suit);
   }
 
+  get isFaceUp() {
+    return this._isFaceUp;
+  }
   get currentPile() {
     return this._currentPile;
   }
