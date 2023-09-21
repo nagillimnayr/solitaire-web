@@ -122,10 +122,18 @@ export const GameMachine = createMachine(
             actions: ['logEvent'],
             target: 'dealing',
           },
-          DRAW_CARD: {
-            actions: ['logEvent'],
-            target: 'drawing',
-          },
+          DRAW_CARD: [
+            {
+              /** If stock is empty, return cards from waste pile.  */
+              cond: ({ stockPile }) => stockPile.isEmpty(),
+              target: 'returningWaste',
+            },
+            {
+              actions: ['logEvent'],
+
+              target: 'drawing',
+            },
+          ],
         },
       },
       restarting: {
@@ -155,10 +163,10 @@ export const GameMachine = createMachine(
       },
       drawing: {
         /** If stock is empty, return cards from waste pile.  */
-        always: {
-          cond: ({ stockPile }) => stockPile.isEmpty(),
-          target: 'returningWaste',
-        },
+        // always: {
+        //   cond: ({ stockPile }) => stockPile.isEmpty(),
+        //   target: 'returningWaste',
+        // },
 
         invoke: {
           src: 'drawCard',
