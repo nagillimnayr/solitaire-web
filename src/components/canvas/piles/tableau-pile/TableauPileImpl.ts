@@ -1,5 +1,6 @@
 import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
+import { Y_OFFSET, Z_OFFSET } from '@/helpers/constants';
 import { Vector3 } from 'three';
 import { lerp } from 'three/src/math/MathUtils';
 
@@ -18,6 +19,14 @@ export class TableauPileImpl extends Pile {
 
   addToPile(card: PlayingCardImpl) {
     // Check that move is valid.
+    if (this._pile.size() !== 0 && !this._pile.peek().isFaceUp) {
+    }
+    this.getWorldPosition(_pos);
+
+    _pos.z += Z_OFFSET * this._pile.size();
+    _pos.y -= Y_OFFSET * this._pile.size();
     this._pile.push(card);
+
+    return card.moveTo(_pos);
   }
 }
