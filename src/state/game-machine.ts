@@ -2,10 +2,11 @@ import { StockPileImpl } from '@/components/canvas/piles/stock-pile/StockPileImp
 import { WastePileImpl } from '@/components/canvas/piles/waste-pile/WastePileImpl';
 import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauPileImpl';
 import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
-import { assign, choose, createMachine, log, raise } from 'xstate';
+import { ContextFrom, assign, choose, createMachine, log, raise } from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
+import { NUMBER_OF_CARDS } from '@/helpers/constants';
 
 type GameContext = {
   stockPile: StockPileImpl;
@@ -104,10 +105,11 @@ export const GameMachine = createMachine(
           DRAW_CARD: [
             {
               /** If stock is empty, return cards from waste pile.  */
-              cond: ({ stockPile }) => stockPile.isEmpty(),
+              cond: 'stockIsEmpty',
               target: 'returningWaste',
             },
             {
+              cond: 'stockNotEmpty',
               actions: ['logEvent'],
               target: 'drawing',
             },
@@ -115,12 +117,29 @@ export const GameMachine = createMachine(
         },
       },
       restarting: {
-        //
-        // always: [{ target: 'idle' }],
         after: {
-          RESTART_DELAY: {
-            target: 'dealing',
-          },
+          /** If stock pile is full, we're done returning the cards. Transition to dealing. */
+          1000: { cond: 'stockIsFull', target: 'dealing' },
+          RESTART_DELAY: [
+            {
+              /** Return cards from tableaus. */
+              cond: 'tableausNotEmpty',
+              actions: ['returnTableau'],
+              target: 'restarting',
+            },
+            {
+              /** Return cards from foundations. */
+              cond: 'foundationsNotEmpty',
+              actions: ['returnFoundation'],
+              target: 'restarting',
+            },
+            {
+              /** Return cards from waste. */
+              cond: 'wasteNotEmpty',
+              actions: ['returnWaste'],
+              target: 'restarting',
+            },
+          ],
         },
       },
       dealing: {
@@ -143,7 +162,7 @@ export const GameMachine = createMachine(
         after: {
           500: {
             /** Only execute if rightmost hasn't been flipped. */
-            cond: ({ tableauPiles }) => tableauPiles[6].needsFlipping,
+            cond: 'tableausNeedFlipping',
             /** Flip next tableau. */
             actions: ['flipTableau', log('Flip Tableau!')],
             /** Recursively self-transition after delay. */
@@ -158,26 +177,21 @@ export const GameMachine = createMachine(
         },
       },
       drawing: {
-        /** If stock is empty, return cards from waste pile.  */
-        // always: {
-        //   cond: ({ stockPile }) => stockPile.isEmpty(),
-        //   target: 'returningWaste',
-        // },
-
         invoke: {
           src: 'drawCard',
           onDone: { target: 'idle' },
         },
       },
       returningWaste: {
-        // always: [
-        //   { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
-        // ],
         after: {
           /** If waste pile is empty, transition to idle. */
-          500: { target: 'idle', cond: ({ wastePile }) => wastePile.isEmpty() },
+          500: {
+            cond: 'wasteIsEmpty',
+            target: 'idle',
+          },
           CARD_DELAY: {
-            actions: ['returnWasteToDeck'],
+            cond: 'wasteNotEmpty',
+            actions: ['returnWaste'],
             /** Recursively self-transition after delay. */
             target: 'returningWaste',
           },
@@ -200,16 +214,35 @@ export const GameMachine = createMachine(
       },
       flipTableau: ({ tableauPiles }) => {
         /** Iterate through tableaus and flip the first one that isn't face up. */
-        for (let i = 0; i < tableauPiles.length; ++i) {
-          if (tableauPiles[i].needsFlipping) {
-            tableauPiles[i].flipTopCard();
+
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.needsFlipping) {
+            tableauPile.flipTopCard();
             return;
           }
         }
+        // for (let i = 0; i < tableauPiles.length; ++i) {
+        //   if (tableauPiles[i].needsFlipping) {
+        //     tableauPiles[i].flipTopCard();
+        //     return;
+        //   }
+        // }
       },
-      returnWasteToDeck: ({ stockPile, wastePile }) => {
+      returnWaste: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
         card.addToPile(stockPile, false);
+      },
+      returnTableau: ({ stockPile, tableauPiles }) => {
+        for (const tableauPile of tableauPiles) {
+          if (!tableauPile.isEmpty()) {
+            const card = tableauPile.drawCard();
+            card.addToPile(stockPile, false);
+          }
+        }
+      },
+      returnFoundation: ({ stockPile, foundationPiles }) => {
+        for (const foundationPile of foundationPiles) {
+        }
       },
     },
     delays: {
@@ -229,7 +262,61 @@ export const GameMachine = createMachine(
       // },
     },
     guards: {
-      /**  */
+      /** Stock. */
+      stockIsFull: ({ stockPile }) => stockPile.count === NUMBER_OF_CARDS,
+      // stockNotFull: ({ stockPile }) => stockPile.count !== NUMBER_OF_CARDS,
+      stockIsEmpty: ({ stockPile }) => stockPile.isEmpty(),
+      stockNotEmpty: ({ stockPile }) => !stockPile.isEmpty(),
+
+      /** Waste. */
+      wasteIsEmpty: ({ wastePile }) => wastePile.isEmpty(),
+      wasteNotEmpty: ({ wastePile }) => !wastePile.isEmpty(),
+
+      /** Tableaus. */
+      // tableausAreEmpty: ({ tableauPiles }) => {
+      //   /** If any piles are not empty, return false. */
+      //   for (const tableauPile of tableauPiles) {
+      //     if (!tableauPile.isEmpty()) return false;
+      //   }
+      //   return true;
+      // },
+      tableausNotEmpty: ({ tableauPiles }) => {
+        /** If any piles are not empty, return true. */
+        for (const tableauPile of tableauPiles) {
+          if (!tableauPile.isEmpty()) return true;
+        }
+        return false;
+      },
+      tableausNeedFlipping: ({ tableauPiles }) => {
+        /** If any piles need flipping, return true. */
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.needsFlipping) return true;
+        }
+        return false;
+      },
+      // tableausDontNeedFlipping: ({ tableauPiles }) => {
+      //   /** If any piles need flipping, return false. */
+      //   for (const tableauPile of tableauPiles) {
+      //     if (tableauPile.needsFlipping) return false;
+      //   }
+      //   return true;
+      // },
+
+      /** Foundations. */
+      // foundationsAreEmpty: ({ foundationPiles }) => {
+      //   /** If any piles are not empty, return false. */
+      //   for (const foundationPile of foundationPiles) {
+      //     if (!foundationPile.isEmpty()) return false;
+      //   }
+      //   return true;
+      // },
+      foundationsNotEmpty: ({ foundationPiles }) => {
+        /** If any piles are not empty, return true. */
+        for (const foundationPile of foundationPiles) {
+          if (!foundationPile.isEmpty()) return true;
+        }
+        return false;
+      },
     },
   },
 );
