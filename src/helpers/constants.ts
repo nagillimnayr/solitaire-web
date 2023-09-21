@@ -11,7 +11,7 @@ export const CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
 export const CARD_ASPECT_RATIO = CARD_WIDTH / CARD_HEIGHT;
 
 export const SMOOTH_TIME = 0.25;
-export const Z_OFFSET = 1e-4;
+export const Z_OFFSET = 1e-3;
 export const Y_OFFSET = CARD_HEIGHT * 0.1;
 
 export const PILE_X_MARGIN = CARD_WIDTH * 0.1; // X-margin around piles.
