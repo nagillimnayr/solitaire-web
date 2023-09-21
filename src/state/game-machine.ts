@@ -6,7 +6,6 @@ import { assign, choose, createMachine, log, raise } from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
-import { WastePile } from '../components/canvas/piles/waste-pile/WastePile';
 
 type GameContext = {
   stockPile: StockPileImpl;
@@ -131,11 +130,28 @@ export const GameMachine = createMachine(
       },
       restarting: {
         //
-        always: [{ target: 'idle' }],
+        // always: [{ target: 'idle' }],
+        after: {
+          RESTART_DELAY: {
+            target: 'dealing',
+          },
+        },
       },
       dealing: {
         //
-        always: [{ target: 'idle' }],
+        always: [
+          {
+            target: 'idle',
+            cond: ({ tableauPiles }) => tableauPiles[6].count >= 7,
+          },
+        ],
+        after: {
+          CARD_DELAY: {
+            actions: ['dealCard'],
+            /** Recursively self-transition after delay. */
+            target: 'dealing',
+          },
+        },
       },
       drawing: {
         /** If stock is empty, return cards from waste pile.  */
@@ -167,6 +183,16 @@ export const GameMachine = createMachine(
   {
     actions: {
       logEvent: log((_, event) => event),
+      dealCard: ({ stockPile, tableauPiles }) => {
+        for (let i = 0; i < tableauPiles.length; ++i) {
+          const tableauPile = tableauPiles[i];
+          if (tableauPile.count < i + 1) {
+            const card = stockPile.drawCard();
+            card.addToPile(tableauPile);
+            return;
+          }
+        }
+      },
       returnWasteToDeck: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
         card.addToPile(stockPile, false);
@@ -176,6 +202,7 @@ export const GameMachine = createMachine(
       CARD_DELAY: (context, event) => {
         return 25;
       },
+      RESTART_DELAY: 500,
     },
     services: {
       drawCard: ({ stockPile, wastePile }) => {
