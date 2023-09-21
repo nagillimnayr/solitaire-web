@@ -12,8 +12,6 @@ type GameContext = {
   wastePile: WastePileImpl;
   foundationPiles: FoundationPileImpl[];
   tableauPiles: TableauPileImpl[];
-
-  numCardsMoving: number;
 };
 
 type GameEvents =
@@ -22,8 +20,7 @@ type GameEvents =
   | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
   | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'ASSIGN_FOUNDATION'; foundationPile: FoundationPileImpl }
-  | { type: 'INCREMENT_NUM_CARDS_MOVING' }
-  | { type: 'DECREMENT_NUM_CARDS_MOVING' }
+
   /** Game events. */
   | { type: 'RESTART' }
   | { type: 'RETURN_WASTE' }
@@ -45,7 +42,6 @@ export const GameMachine = createMachine(
       wastePile: null!,
       foundationPiles: new Array<FoundationPileImpl>(4),
       tableauPiles: new Array<TableauPileImpl>(7),
-      numCardsMoving: 0,
     },
 
     on: {
@@ -82,23 +78,6 @@ export const GameMachine = createMachine(
               newArray[foundationPile.suit] = foundationPile;
               return newArray;
             },
-          }),
-        ],
-      },
-      INCREMENT_NUM_CARDS_MOVING: {
-        actions: [
-          'logEvent',
-          assign({
-            numCardsMoving: ({ numCardsMoving }) => numCardsMoving + 1,
-          }),
-        ],
-      },
-      DECREMENT_NUM_CARDS_MOVING: {
-        cond: ({ numCardsMoving }) => numCardsMoving > 0,
-        actions: [
-          'logEvent',
-          assign({
-            numCardsMoving: ({ numCardsMoving }) => numCardsMoving - 1,
           }),
         ],
       },
