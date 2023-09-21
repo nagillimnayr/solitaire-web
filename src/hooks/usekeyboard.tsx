@@ -5,7 +5,9 @@ import { useEventListener } from 'usehooks-ts';
 export function useKeyboard() {
   const { GameActor } = useContext(GlobalStateContext);
   useEventListener('keypress', (event) => {
-    console.log(event.code);
+    event.preventDefault();
+    event.stopPropagation();
+    // console.log(event.code);
     switch (event.code) {
       case 'Space': {
         GameActor.send({ type: 'DRAW_CARD' });
