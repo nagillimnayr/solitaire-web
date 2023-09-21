@@ -29,4 +29,13 @@ export class TableauPileImpl extends Pile {
 
     return card.moveTo(_pos);
   }
+
+  flipTopCard() {
+    const topCard = this._pile.peek();
+    if (topCard.isFaceUp) {
+      console.warn('Top card is already face up.');
+      return;
+    }
+    topCard.flipFaceUp();
+  }
 }
