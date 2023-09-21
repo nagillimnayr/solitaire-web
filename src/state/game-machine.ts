@@ -124,7 +124,7 @@ export const GameMachine = createMachine(
         after: {
           /** If stock pile is full, we're done returning the cards. Transition to dealing. */
           1000: { cond: 'stockIsFull', target: 'dealing' },
-          RESTART_DELAY: [
+          50: [
             {
               /** Return cards from tableaus. */
               cond: 'tableausNotEmpty',
@@ -164,7 +164,7 @@ export const GameMachine = createMachine(
       },
       flippingTableaus: {
         after: {
-          500: {
+          300: {
             /** Only execute if rightmost hasn't been flipped. */
             cond: 'tableausNeedFlipping',
             /** Flip next tableau. */
@@ -235,17 +235,21 @@ export const GameMachine = createMachine(
         card.addToPile(stockPile, false);
       },
       returnTableau: ({ stockPile, tableauPiles }) => {
+        /** Return card from first non-empty pile. */
         for (const tableauPile of tableauPiles) {
           if (!tableauPile.isEmpty()) {
             const card = tableauPile.drawCard();
             card.addToPile(stockPile, false);
+            return;
           }
         }
       },
       returnFoundation: ({ stockPile, foundationPiles }) => {
+        /** Return card from first non-empty pile. */
         for (const foundationPile of foundationPiles) {
           const card = foundationPile.drawCard();
           card.addToPile(stockPile, false);
+          return;
         }
       },
     },
@@ -253,7 +257,6 @@ export const GameMachine = createMachine(
       CARD_DELAY: (context, event) => {
         return 50;
       },
-      RESTART_DELAY: 500,
     },
     services: {
       drawCard: ({ stockPile, wastePile }) => {
