@@ -13,8 +13,12 @@ export class TableauPileImpl extends Pile {
     this._index = index;
     this.name = `tableau-${index + 1}`;
   }
+
   get index() {
     return this._index;
+  }
+  get needsFlipping() {
+    return !this._pile.peek().isFaceUp;
   }
 
   addToPile(card: PlayingCardImpl) {
