@@ -1,7 +1,13 @@
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
 import { Euler, Object3D, Vector3 } from 'three';
 import { Pile } from '../piles/Pile';
-import { PI, SMOOTH_TIME, Z_OFFSET } from '@/helpers/constants';
+import {
+  CARD_HEIGHT,
+  CARD_WIDTH,
+  PI,
+  SMOOTH_TIME,
+  Z_OFFSET,
+} from '@/helpers/constants';
 import { damp, damp3, dampE } from 'maath/easing';
 
 const _pos = new Vector3();
@@ -17,7 +23,7 @@ export class PlayingCardImpl extends Object3D {
   private _targetPos: Vector3 = new Vector3();
   private _targetRotation: Euler = new Euler();
 
-  private _isFaceUp = false;
+  private _isFaceUp = true;
   private _isMoving = false;
   private _isRotating = false;
 
@@ -69,6 +75,7 @@ export class PlayingCardImpl extends Object3D {
 
   moveTo(newPos: Vector3) {
     this.dispatchEvent({ type: 'START_MOVE' });
+    this.position.z += newPos.z * 2;
     this._targetPos.copy(newPos);
     this._isMoving = true;
 
@@ -85,11 +92,17 @@ export class PlayingCardImpl extends Object3D {
   }
 
   flipFaceUp() {
+    if (this._isFaceUp) return;
     this._isFaceUp = true;
     this._targetRotation.y = 0;
+    /** Move up in Z axis when flipping to avoid clipping. */
+    this.position.z += CARD_HEIGHT;
   }
   flipFaceDown() {
+    if (!this._isFaceUp) return;
     this._isFaceUp = false;
     this._targetRotation.y = PI;
+    /** Move up in Z axis when flipping to avoid clipping. */
+    this.position.z += CARD_HEIGHT;
   }
 }
