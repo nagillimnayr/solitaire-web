@@ -20,6 +20,8 @@ export class PlayingCardImpl extends Object3D {
   private _targetRotation: Euler = new Euler();
 
   private _isFaceUp = false;
+  private _isMoving = false;
+  private _isRotating = false;
 
   constructor(rank: number, suit: number) {
     super();
@@ -29,8 +31,21 @@ export class PlayingCardImpl extends Object3D {
   }
 
   update(deltaTime) {
-    damp3(this.position, this._targetPos, SMOOTH_TIME, deltaTime);
-    dampE(this.rotation, this._targetRotation, SMOOTH_TIME, deltaTime);
+    const isMoving = damp3(
+      this.position,
+      this._targetPos,
+      SMOOTH_TIME,
+      deltaTime,
+    );
+    const isRotating = dampE(
+      this.rotation,
+      this._targetRotation,
+      SMOOTH_TIME,
+      deltaTime,
+    );
+    if (this._isMoving && !isMoving) {
+      this.dispatchEvent({ type: 'rest' });
+    }
   }
 
   addToPile(pile: Pile, faceUp: boolean = false) {
@@ -45,11 +60,23 @@ export class PlayingCardImpl extends Object3D {
 
     pile.getWorldPosition(_pos);
     _pos.z += Z_OFFSET * pile.count;
-    this.moveTo(_pos);
+    return this.moveTo(_pos);
   }
 
   moveTo(newPos: Vector3) {
+    this.dispatchEvent({ type: 'start-move' });
     this._targetPos.copy(newPos);
+    this._isMoving = true;
+
+    // Create promise that will be resolved when the 'rest' event is triggered.
+    return new Promise<never>((resolve) => {
+      const onResolve = () => {
+        this.removeEventListener('rest', onResolve);
+        this._isMoving = false;
+        resolve(null);
+      };
+      this.addEventListener('rest', onResolve);
+    });
   }
 
   flipFaceUp() {
