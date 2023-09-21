@@ -14,6 +14,7 @@ import { Vector3 } from 'three';
 import { Tableaus } from './piles/Tableaus';
 import { Foundations } from './piles/Foundations';
 import { GlobalStateContext } from '../dom/providers/GlobalStateProvider';
+import { useKeyboard } from '@/hooks/usekeyboard';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -41,6 +42,8 @@ export const SolitaireGame = () => {
   useEffect(() => {
     GameActor.send({ type: 'RESTART' });
   }, [GameActor]);
+
+  useKeyboard();
 
   return (
     <group>
