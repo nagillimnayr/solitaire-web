@@ -1,13 +1,13 @@
 'use client';
 
-import { SolitaireGame } from '@/components/canvas/SolitaireGame';
+import { SolitaireGame } from '@/components/canvas/game/SolitaireGame';
 import { PlayingCard } from '@/components/canvas/playing-card/PlayingCard';
 import { GameHud } from '@/components/dom/hud/GameHud';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
 const View = dynamic(
-  () => import('@/components/canvas/View').then((mod) => mod.View),
+  () => import('@/components/canvas/scene/View').then((mod) => mod.View),
   {
     ssr: false,
     loading: () => (
@@ -36,7 +36,7 @@ const View = dynamic(
   },
 );
 const Common = dynamic(
-  () => import('@/components/canvas/View').then((mod) => mod.Common),
+  () => import('@/components/canvas/scene/View').then((mod) => mod.Common),
   { ssr: false },
 );
 

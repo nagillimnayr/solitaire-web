@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo } from 'react';
-import { Background } from './Background';
-import { PlayingCard } from './playing-card/PlayingCard';
+import { Background } from '../scene/Background';
+import { PlayingCard } from '../playing-card/PlayingCard';
 import {
   CARD_HEIGHT_WITH_MARGIN,
   CARD_WIDTH_HALF,
@@ -9,11 +9,11 @@ import {
   SUITS,
 } from '@/helpers/constants';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
-import { StockAndWaste } from './piles/StockAndWaste';
+import { StockAndWaste } from '../piles/StockAndWaste';
 import { Vector3 } from 'three';
-import { Tableaus } from './piles/Tableaus';
-import { Foundations } from './piles/Foundations';
-import { GlobalStateContext } from '../dom/providers/GlobalStateProvider';
+import { Tableaus } from '../piles/Tableaus';
+import { Foundations } from '../piles/Foundations';
+import { GlobalStateContext } from '../../dom/providers/GlobalStateProvider';
 import { useKeyboard } from '@/hooks/usekeyboard';
 
 const STOCK_AND_WASTE_POS = new Vector3(
