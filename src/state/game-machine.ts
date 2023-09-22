@@ -14,6 +14,7 @@ import {
 } from '@/helpers/constants';
 import { Vector3 } from 'three';
 import { randInt } from 'three/src/math/MathUtils';
+import { Stack } from '@datastructures-js/stack';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -32,6 +33,7 @@ type GameContext = {
   tableauPiles: TableauPileImpl[];
 
   splitPiles: SplitPiles; // Helper for shuffling the deck.
+  carryStack: Stack<PlayingCardImpl>;
 };
 
 type GameEvents =
@@ -46,7 +48,10 @@ type GameEvents =
   | { type: 'RESTART' }
   | { type: 'RETURN_WASTE' }
   | { type: 'DEAL_CARDS' }
-  | { type: 'DRAW_CARD' };
+  | { type: 'DRAW_CARD' }
+  | { type: 'PICKUP_CARD' }
+  | { type: 'DROP_CARD' }
+  | { type: 'PLACE_CARD' };
 
 export const GameMachine = createMachine(
   {
@@ -68,6 +73,8 @@ export const GameMachine = createMachine(
         pile1: new Array<PlayingCardImpl>(),
         pile2: new Array<PlayingCardImpl>(),
       },
+
+      carryStack: new Stack<PlayingCardImpl>(),
     },
 
     on: {
@@ -86,25 +93,17 @@ export const GameMachine = createMachine(
       ASSIGN_TABLEAU: {
         actions: [
           'logEvent',
-          assign({
-            tableauPiles: ({ tableauPiles }, { tableauPile }) => {
-              const newArray = tableauPiles.slice();
-              newArray[tableauPile.index] = tableauPile;
-              return newArray;
-            },
-          }),
+          ({ tableauPiles }, { tableauPile }) => {
+            tableauPiles[tableauPile.index] = tableauPile;
+          },
         ],
       },
       ASSIGN_FOUNDATION: {
         actions: [
           'logEvent',
-          assign({
-            foundationPiles: ({ foundationPiles }, { foundationPile }) => {
-              const newArray = foundationPiles.slice();
-              newArray[foundationPile.suit] = foundationPile;
-              return newArray;
-            },
-          }),
+          ({ foundationPiles }, { foundationPile }) => {
+            foundationPiles[foundationPile.suit] = foundationPile;
+          },
         ],
       },
       INIT_CARD: {
