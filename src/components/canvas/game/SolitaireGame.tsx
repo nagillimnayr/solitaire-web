@@ -17,6 +17,7 @@ import { GlobalStateContext } from '../../dom/providers/GlobalStateProvider';
 import { useKeyboard } from '@/hooks/usekeyboard';
 import { CarryPile } from '../piles/carry-pile/CarryPile';
 import { useThree } from '@react-three/fiber';
+import { useEventListener } from 'usehooks-ts';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -47,14 +48,19 @@ export const SolitaireGame = () => {
     );
   }, []);
 
+  /** Restart game. */
   useEffect(() => {
     GameActor.send({ type: 'RESTART' });
   }, [GameActor]);
 
   useKeyboard();
 
+  useEventListener('pointerup', (event) => {
+    GameActor.send({ type: 'DROP_CARD' });
+  });
+
   return (
-    <group>
+    <group name='solitaire-game'>
       <axesHelper />
       <Background />
       <StockAndWaste position={STOCK_AND_WASTE_POS} />

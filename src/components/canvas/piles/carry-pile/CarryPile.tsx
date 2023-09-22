@@ -44,11 +44,9 @@ export const CarryPile = ({}: CarryPileProps) => {
   });
 
   return (
-    <object3D>
-      <carryPileImpl ref={ref}>
-        <axesHelper rotation-y={PI} />
-        <Ring args={[0.9, 1]} scale={0.01} />
-      </carryPileImpl>
-    </object3D>
+    <carryPileImpl ref={ref}>
+      <axesHelper rotation-y={PI} />
+      <Ring args={[0.9, 1]} scale={0.01} />
+    </carryPileImpl>
   );
 };

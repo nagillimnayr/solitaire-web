@@ -160,6 +160,7 @@ export const GameMachine = createMachine(
             cond: ({ carryPile }, { card }) =>
               card.isFaceUp && !Object.is(card.currentPile, carryPile),
             actions: ['logEvent', 'pickupCard', 'lockCameraControls'],
+            target: 'carryingCards',
           },
           DROP_CARD: {
             actions: ['unlockCameraControls'],
@@ -283,8 +284,22 @@ export const GameMachine = createMachine(
           },
         },
       },
+      carryingCards: {
+        on: {
+          DROP_CARD: {
+            target: 'droppingCards',
+          },
+        },
+      },
       droppingCards: {
-        always: { target: 'idle' },
+        after: {
+          200: { cond: 'carryPileIsEmpty', target: 'idle' },
+          50: {
+            cond: 'carryPileNotEmpty',
+            actions: ['dropCard'],
+            target: 'droppingCards',
+          },
+        },
       },
     },
   },
@@ -404,14 +419,15 @@ export const GameMachine = createMachine(
       },
       lockCameraControls: ({ getThree }) => {
         const { controls } = getThree();
-        console.log(controls);
         (controls as unknown as CameraControls).enabled = false;
-        console.log('lock');
       },
       unlockCameraControls: ({ getThree }) => {
         const { controls } = getThree();
         (controls as unknown as CameraControls).enabled = true;
-        console.log('unlock');
+      },
+      dropCard: ({ carryPile }) => {
+        // const card = carryPile.drawCard();
+        carryPile.dropCard();
       },
     },
     delays: {
@@ -485,6 +501,10 @@ export const GameMachine = createMachine(
         }
         return false;
       },
+
+      /** Carry Pile. */
+      carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
+      carryPileNotEmpty: ({ carryPile }) => !carryPile.isEmpty(),
     },
   },
 );
