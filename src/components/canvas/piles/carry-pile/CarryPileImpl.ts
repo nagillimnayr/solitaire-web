@@ -14,11 +14,9 @@ export class CarryPileImpl extends Pile {
 
   addToPile(card: PlayingCardImpl): Promise<never> {
     card.getWorldPosition(_pos1);
-    console.log('before: ', _pos1.toArray());
     this.attach(card);
 
     card.getWorldPosition(_pos1);
-    console.log('after: ', _pos1.toArray());
 
     _pos3.copy(card.position);
     _pos3.z = Z_OFFSET * this.count;
