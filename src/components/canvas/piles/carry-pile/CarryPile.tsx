@@ -4,7 +4,7 @@ import { useContext, useEffect, useMemo, useRef } from 'react';
 import { Object3DNode, extend, useFrame } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { Plane, Vector3 } from 'three';
-import { Ring } from '@react-three/drei';
+import { MeshDiscardMaterial, Ring } from '@react-three/drei';
 import { PI } from '@/helpers/constants';
 
 const _pos = new Vector3();
@@ -45,6 +45,7 @@ export const CarryPile = ({}: CarryPileProps) => {
 
   return (
     <carryPileImpl ref={ref}>
+      <MeshDiscardMaterial />
       <axesHelper rotation-y={PI} />
       <Ring args={[0.9, 1]} scale={0.01} />
     </carryPileImpl>
