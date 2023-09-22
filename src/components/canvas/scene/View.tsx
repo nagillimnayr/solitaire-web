@@ -12,6 +12,7 @@ import {
   OrbitControls,
   PerspectiveCamera,
   View as ViewImpl,
+  CameraControls,
 } from '@react-three/drei';
 import { Three } from '@/helpers/components/Three';
 import { ColorRepresentation } from 'three';
@@ -45,7 +46,7 @@ const View = forwardRef<HTMLDivElement, ViewProps>(
         <Three>
           <ViewImpl track={localRef}>
             {children}
-            {orbit && <OrbitControls />}
+            {orbit && <CameraControls />}
           </ViewImpl>
         </Three>
       </>
