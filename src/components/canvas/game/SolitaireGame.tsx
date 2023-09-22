@@ -16,6 +16,7 @@ import { Foundations } from '../piles/Foundations';
 import { GlobalStateContext } from '../../dom/providers/GlobalStateProvider';
 import { useKeyboard } from '@/hooks/usekeyboard';
 import { CarryPile } from '../piles/carry-pile/CarryPile';
+import { useThree } from '@react-three/fiber';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -31,6 +32,12 @@ const TABLEAUS_POS = new Vector3(0, 0, 0);
 
 export const SolitaireGame = () => {
   const { GameActor } = useContext(GlobalStateContext);
+  const getThree = useThree(({ get }) => get);
+
+  useEffect(() => {
+    GameActor.send({ type: 'ASSIGN_GET_THREE', getThree });
+  }, [GameActor, getThree]);
+
   const cards = useMemo(() => {
     return Object.keys(SUITS).map((suit, suitIndex) =>
       RANKS.map((rank, rankIndex) => {

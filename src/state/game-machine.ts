@@ -16,6 +16,7 @@ import { Vector3 } from 'three';
 import { randInt } from 'three/src/math/MathUtils';
 import { Stack } from '@datastructures-js/stack';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
+import { RootState } from '@react-three/fiber';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -28,6 +29,7 @@ type SplitPiles = {
 };
 
 type GameContext = {
+  getThree: () => RootState;
   stockPile: StockPileImpl;
   wastePile: WastePileImpl;
   foundationPiles: FoundationPileImpl[];
@@ -39,6 +41,7 @@ type GameContext = {
 
 type GameEvents =
   /** Assignment events. */
+  | { type: 'ASSIGN_GET_THREE'; getThree: () => RootState }
   | { type: 'ASSIGN_STOCK'; stockPile: StockPileImpl }
   | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
   | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
@@ -67,6 +70,7 @@ export const GameMachine = createMachine(
     id: 'game-machine',
 
     context: {
+      getThree: null!,
       stockPile: null!,
       wastePile: null!,
       foundationPiles: new Array<FoundationPileImpl>(4),
@@ -81,6 +85,9 @@ export const GameMachine = createMachine(
     },
 
     on: {
+      ASSIGN_GET_THREE: {
+        actions: [assign({ getThree: (_, { getThree }) => getThree })],
+      },
       ASSIGN_STOCK: {
         actions: [
           'logEvent',
