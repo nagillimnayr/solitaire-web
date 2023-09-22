@@ -278,7 +278,6 @@ export const GameMachine = createMachine(
       carryingCards: {
         on: {
           DROP_CARD: {
-            cond: ({ carryPile }) => !carryPile.isEmpty(),
             actions: ['logEvent', 'unlockCameraControls'],
             target: 'droppingCards',
           },
