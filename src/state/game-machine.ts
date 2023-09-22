@@ -406,7 +406,8 @@ export const GameMachine = createMachine(
         }
       },
       pickupCard: ({ carryPile }, { card, intersection }) => {
-        card.worldToLocal(intersection);
+        // card.worldToLocal(intersection);
+        _pos1;
         intersection.subVectors(card.position, intersection);
 
         if (card.currentPile instanceof TableauPileImpl) {
@@ -415,12 +416,12 @@ export const GameMachine = createMachine(
           do {
             card2 = tableauPile.drawCard();
             card2.addToPile(carryPile, true);
-            // card2.moveTo(intersection);
+            card2.moveTo(intersection);
           } while (!Object.is(card, card2));
         } else {
           card.currentPile.drawCard();
           card.addToPile(carryPile, true);
-          // card.moveTo(intersection);
+          card.moveTo(intersection);
         }
       },
       lockCameraControls: ({ getThree }) => {

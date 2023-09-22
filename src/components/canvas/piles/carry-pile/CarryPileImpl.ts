@@ -24,8 +24,8 @@ export class CarryPileImpl extends Pile {
     _pos3.z = Z_OFFSET * this.count;
     this._pile.push(card);
     _pos2.set(0, 0, 0);
-    // return card.moveTo(card.position);
-    return card.moveTo(_pos2);
+    return card.moveTo(card.position);
+    // return card.moveTo(_pos2);
   }
 
   dropCard() {

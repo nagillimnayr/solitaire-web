@@ -88,6 +88,8 @@ export class PlayingCardImpl extends Object3D {
     // this.position.z += newPos.z;
     this._targetPos.copy(newPos);
     this._isMoving = true;
+
+    /** Need to set 'from' as the current position so that it will work properly even when attaching to a different object. */
     const [x0, y0, z0] = this.position.toArray();
     const [x, y, z] = newPos.toArray();
     this._springRef.start({ from: { x: x0, y: y0, z: z0 }, to: { x, y, z } });
