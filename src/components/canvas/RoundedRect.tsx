@@ -1,4 +1,5 @@
 import { BufferGeometryNode, extend } from '@react-three/fiber';
+import { EventHandlers } from '@react-three/fiber/dist/declarations/src/core/events';
 import { RoundedPlaneGeometry } from 'maath/geometry';
 import { type ReactNode, useMemo } from 'react';
 
@@ -12,13 +13,13 @@ declare module '@react-three/fiber' {
   }
 }
 
-interface RoundedRectProps {
+type RoundedRectProps = {
   width?: number;
   height?: number;
   radius?: number;
   segments?: number;
   children?: ReactNode;
-}
+} & EventHandlers;
 
 export const RoundedRect = ({
   width,
@@ -26,6 +27,7 @@ export const RoundedRect = ({
   radius,
   segments,
   children,
+  ...eventHandlers
 }: RoundedRectProps) => {
   const geometry = useMemo(() => {
     return new RoundedPlaneGeometry(width, height, radius, segments);
@@ -33,7 +35,9 @@ export const RoundedRect = ({
 
   return (
     <>
-      <mesh geometry={geometry}>{children}</mesh>
+      <mesh geometry={geometry} {...eventHandlers}>
+        {children}
+      </mesh>
     </>
   );
 };

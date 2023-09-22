@@ -5,6 +5,7 @@ import { PlayingCardMaterial } from './playing-card-shader/PlayingCardMaterial';
 import { usePlayingCardTexture } from './usePlayingCardTexture';
 import {
   forwardRef,
+  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -13,7 +14,7 @@ import {
 } from 'react';
 import { useSpring, animated, useSpringRef } from '@react-spring/three';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
-import { Object3DNode, extend, useFrame } from '@react-three/fiber';
+import { Object3DNode, ThreeEvent, extend, useFrame } from '@react-three/fiber';
 import { CardSpringRef, PlayingCardImpl } from './PlayingCardImpl';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { Vector3, Vector3Tuple } from 'three';
@@ -69,19 +70,6 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         rotation && (card.rotation.y = rotation);
         card.position.set(x, y, z);
       },
-      // onChange: {
-      //   position: (result, spring) => {
-
-      //     const position = result.value as Vector3Tuple;
-      //     const card = localRef.current;
-      //     // card.position.set(...position);
-      //   },
-      //   rotation: (result, spring) => {
-      //     if (typeof result !== 'number') return;
-      //     const card = localRef.current;
-      //     card.rotation.y = result;
-      //   },
-      // },
     }));
 
     useFrame((state, delta) => {
@@ -89,6 +77,24 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       if (!card) return;
       card.update(delta);
     });
+
+    const handlePointerDown = useCallback(
+      (event: ThreeEvent<PointerEvent>) => {
+        /**  */
+        event.stopPropagation();
+        const card = localRef.current;
+        GameActor.send({ type: 'PICKUP_CARD', card });
+      },
+      [GameActor],
+    );
+    const handlePointerUp = useCallback((event: ThreeEvent<PointerEvent>) => {
+      /**  */
+      event.stopPropagation();
+    }, []);
+    const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
+      /**  */
+      event.stopPropagation();
+    }, []);
 
     const userData = useMemo(() => ({ rank, suit }), [rank, suit]);
     const name = makePlayingCardName(rank, suit);
@@ -102,7 +108,14 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         userData={userData}
         springRef={springRef}
       >
-        <RoundedRect width={CARD_WIDTH} height={CARD_HEIGHT} radius={RADIUS}>
+        <RoundedRect
+          width={CARD_WIDTH}
+          height={CARD_HEIGHT}
+          radius={RADIUS}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onClick={handleClick}
+        >
           <PlayingCardMaterial frontTexture={frontTexture} />
         </RoundedRect>
       </playingCardImpl>
