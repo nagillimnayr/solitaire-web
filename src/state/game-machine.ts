@@ -53,7 +53,6 @@ type GameEvents =
   /** Game events. */
   | { type: 'RESTART' }
   | { type: 'RETURN_WASTE' }
-  | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' }
   | { type: 'PICKUP_CARD'; card: PlayingCardImpl; intersection: Vector3 }
   | { type: 'DROP_CARD' }
@@ -139,10 +138,6 @@ export const GameMachine = createMachine(
             actions: ['logEvent'],
             target: 'returningWaste',
           },
-          DEAL_CARDS: {
-            actions: ['logEvent'],
-            target: 'dealing',
-          },
           DRAW_CARD: [
             {
               /** If stock is empty, return cards from waste pile.  */
@@ -163,6 +158,7 @@ export const GameMachine = createMachine(
             target: 'carryingCards',
           },
           DROP_CARD: {
+            cond: ({ carryPile }) => !carryPile.isEmpty(),
             actions: ['unlockCameraControls'],
             target: 'droppingCards',
           },
