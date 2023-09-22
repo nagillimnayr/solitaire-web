@@ -88,8 +88,9 @@ export class PlayingCardImpl extends Object3D {
     // this.position.z += newPos.z;
     this._targetPos.copy(newPos);
     this._isMoving = true;
+    const [x0, y0, z0] = this.position.toArray();
     const [x, y, z] = newPos.toArray();
-    this._springRef.start({ x, y, z });
+    this._springRef.start({ from: { x: x0, y: y0, z: z0 }, to: { x, y, z } });
 
     // Create promise that will be resolved when the 'rest' event is triggered.
     return new Promise<never>((resolve) => {

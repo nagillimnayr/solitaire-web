@@ -55,7 +55,7 @@ type GameEvents =
   | { type: 'RETURN_WASTE' }
   | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' }
-  | { type: 'PICKUP_CARD'; card: PlayingCardImpl }
+  | { type: 'PICKUP_CARD'; card: PlayingCardImpl; intersection: Vector3 }
   | { type: 'DROP_CARD' }
   | { type: 'PLACE_CARD' }
   | { type: 'CLICK_CARD'; card: PlayingCardImpl };
@@ -405,16 +405,22 @@ export const GameMachine = createMachine(
           return;
         }
       },
-      pickupCard: ({ carryPile }, { card }) => {
+      pickupCard: ({ carryPile }, { card, intersection }) => {
+        card.worldToLocal(intersection);
+        intersection.subVectors(card.position, intersection);
+
         if (card.currentPile instanceof TableauPileImpl) {
           const tableauPile = card.currentPile;
           let card2: PlayingCardImpl;
           do {
             card2 = tableauPile.drawCard();
             card2.addToPile(carryPile, true);
+            // card2.moveTo(intersection);
           } while (!Object.is(card, card2));
         } else {
+          card.currentPile.drawCard();
           card.addToPile(carryPile, true);
+          // card.moveTo(intersection);
         }
       },
       lockCameraControls: ({ getThree }) => {

@@ -14,15 +14,18 @@ export class CarryPileImpl extends Pile {
 
   addToPile(card: PlayingCardImpl): Promise<never> {
     card.getWorldPosition(_pos1);
-    this.getWorldPosition(_pos2);
-    _pos3.subVectors(_pos1, _pos2);
+    console.log('before: ', _pos1.toArray());
+    this.attach(card);
 
-    this.add(card);
-    card.position.copy(_pos3);
+    card.getWorldPosition(_pos1);
+    console.log('after: ', _pos1.toArray());
 
+    _pos3.copy(card.position);
     _pos3.z = Z_OFFSET * this.count;
     this._pile.push(card);
-    return card.moveTo(_pos3);
+    _pos2.set(0, 0, 0);
+    // return card.moveTo(card.position);
+    return card.moveTo(_pos2);
   }
 
   dropCard() {
@@ -32,9 +35,9 @@ export class CarryPileImpl extends Pile {
     this.getWorldPosition(_pos2);
     _pos3.subVectors(_pos1, _pos2);
 
-    this.parent?.add(card);
+    this.parent?.attach(card);
 
-    card.position.copy(_pos3);
+    // card.position.copy(_pos3);
 
     card.addToPile(card.previousPile, true);
   }

@@ -83,7 +83,10 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         /**  */
         event.stopPropagation();
         const card = localRef.current;
-        GameActor.send({ type: 'PICKUP_CARD', card });
+        const intersection = event.point;
+        card.isFaceUp
+          ? GameActor.send({ type: 'PICKUP_CARD', card, intersection })
+          : GameActor.send({ type: 'CLICK_CARD', card });
       },
       [GameActor],
     );
