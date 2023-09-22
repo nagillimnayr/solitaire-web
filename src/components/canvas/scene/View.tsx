@@ -46,7 +46,7 @@ const View = forwardRef<HTMLDivElement, ViewProps>(
         <Three>
           <ViewImpl track={localRef}>
             {children}
-            {orbit && <CameraControls />}
+            {orbit && <CameraControls makeDefault />}
           </ViewImpl>
         </Three>
       </>

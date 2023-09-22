@@ -17,6 +17,7 @@ import { randInt } from 'three/src/math/MathUtils';
 import { Stack } from '@datastructures-js/stack';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
 import { RootState } from '@react-three/fiber';
+import { CameraControls } from 'three-stdlib';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -158,9 +159,12 @@ export const GameMachine = createMachine(
             /** Only valid if card is face up. */
             cond: ({ carryPile }, { card }) =>
               card.isFaceUp && !Object.is(card.currentPile, carryPile),
-            actions: ['logEvent', 'pickupCard'],
+            actions: ['logEvent', 'pickupCard', 'lockCameraControls'],
           },
-          DROP_CARD: {},
+          DROP_CARD: {
+            actions: ['unlockCameraControls'],
+            target: 'droppingCards',
+          },
           PLACE_CARD: {},
           CLICK_CARD: {
             cond: ({ stockPile }, { card }) =>
@@ -279,6 +283,9 @@ export const GameMachine = createMachine(
           },
         },
       },
+      droppingCards: {
+        always: { target: 'idle' },
+      },
     },
   },
   {
@@ -394,6 +401,17 @@ export const GameMachine = createMachine(
         } else {
           card.addToPile(carryPile, true);
         }
+      },
+      lockCameraControls: ({ getThree }) => {
+        const { controls } = getThree();
+        console.log(controls);
+        (controls as unknown as CameraControls).enabled = false;
+        console.log('lock');
+      },
+      unlockCameraControls: ({ getThree }) => {
+        const { controls } = getThree();
+        (controls as unknown as CameraControls).enabled = true;
+        console.log('unlock');
       },
     },
     delays: {
