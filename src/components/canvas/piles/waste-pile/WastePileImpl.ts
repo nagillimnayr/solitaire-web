@@ -12,10 +12,10 @@ export class WastePileImpl extends Pile {
   }
 
   addToPile(card: PlayingCardImpl) {
-    this._pile.push(card);
     this.getWorldPosition(_pos);
-
     _pos.z += Z_OFFSET * this._pile.size();
+    this._pile.push(card);
+
     return card.moveTo(_pos);
   }
 }
