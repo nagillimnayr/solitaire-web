@@ -177,7 +177,7 @@ export const GameMachine = createMachine(
       restarting: {
         after: {
           /** If stock pile is full, we're done returning the cards. Transition to dealing. */
-          1000: { cond: 'stockIsFull', target: 'splittingDeck' },
+          500: { cond: 'stockIsFull', target: 'splittingDeck' },
           50: [
             {
               /** Return cards from tableaus. */
@@ -202,7 +202,7 @@ export const GameMachine = createMachine(
       },
       splittingDeck: {
         after: {
-          500: {
+          250: {
             /** Once the stockPile is empty, transition to shuffling. */
             cond: 'stockIsEmpty',
             target: 'shuffling',
@@ -220,7 +220,7 @@ export const GameMachine = createMachine(
       shuffling: {
         after: {
           /** When stock is full again, transition to dealing. */
-          1000: { cond: 'stockIsFull', target: 'dealing' },
+          500: { cond: 'stockIsFull', target: 'dealing' },
           20: {
             cond: 'stockNotFull',
             /** Add the cards back to the stockPile in a random order.*/
@@ -247,7 +247,7 @@ export const GameMachine = createMachine(
       },
       flippingTableaus: {
         after: {
-          300: {
+          100: {
             /** Only execute if rightmost hasn't been flipped. */
             cond: 'tableausNeedFlipping',
             /** Flip next tableau. */
@@ -255,7 +255,7 @@ export const GameMachine = createMachine(
             /** Recursively self-transition after delay. */
             target: 'flippingTableaus',
           },
-          1000: {
+          500: {
             /** If rightmost tableau is face-up, transition to idle. */
             // cond: ({ tableauPiles }) => !tableauPiles[6].needsFlipping,
             actions: [log('Done flipping tableaus.')],
@@ -272,7 +272,7 @@ export const GameMachine = createMachine(
       returningWaste: {
         after: {
           /** If waste pile is empty, transition to idle. */
-          500: {
+          300: {
             cond: 'wasteIsEmpty',
             target: 'idle',
           },
