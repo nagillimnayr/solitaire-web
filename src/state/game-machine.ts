@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
 import {
+  CARD_WIDTH_HALF_WITH_MARGIN,
   CARD_WIDTH_WITH_MARGIN,
   NUMBER_OF_CARDS,
   Z_OFFSET,
@@ -171,12 +172,12 @@ export const GameMachine = createMachine(
       },
       splittingDeck: {
         after: {
-          1000: {
+          500: {
             /** Once the stockPile is empty, transition to shuffling. */
             cond: 'stockIsEmpty',
             target: 'shuffling',
           },
-          50: {
+          20: {
             cond: 'stockNotEmpty',
             // cond: ({ stockPile }) => stockPile.count > HALF_DECK_SIZE,
             /** Take cards from the stockPile and add them to splitPiles.*/
@@ -190,7 +191,7 @@ export const GameMachine = createMachine(
         after: {
           /** When stock is full again, transition to dealing. */
           1000: { cond: 'stockIsFull', target: 'dealing' },
-          CARD_DELAY: {
+          20: {
             cond: 'stockNotFull',
             /** Add the cards back to the stockPile in a random order.*/
             actions: ['shuffleDeck'],
@@ -269,9 +270,11 @@ export const GameMachine = createMachine(
         const card2 = stockPile.drawCard();
 
         stockPile.getWorldPosition(_pos1);
-        stockPile.getWorldPosition(_pos2);
-        _pos1.x -= CARD_WIDTH_WITH_MARGIN;
+        _pos1.x -= CARD_WIDTH_HALF_WITH_MARGIN;
         _pos1.z += pile1.length * Z_OFFSET;
+
+        stockPile.getWorldPosition(_pos2);
+        _pos2.x += CARD_WIDTH_HALF_WITH_MARGIN;
         _pos2.z += pile2.length * Z_OFFSET;
 
         /** Randomize which card goes to which pile. */
