@@ -117,23 +117,42 @@ export class PlayingCardImpl extends Object3D {
     if (this._isFaceUp) return;
     this._isFaceUp = true;
 
+    const z = Math.max(this.position.z, this._targetPos.z);
     this._springRef.start({
       to: [
-        { z: this._targetPos.z + CARD_WIDTH_HALF },
-        { z: this._targetPos.z },
+        {
+          z: z + CARD_WIDTH_HALF,
+          /** Reduce friction a bit to speed up the animation. */
+          config: { precision: 1e-4, clamp: true, friction: 20 },
+        },
+        {
+          z: this._targetPos.z,
+          /** Reduce friction a bit to speed up the animation. */
+          config: { precision: 1e-4, clamp: true, friction: 20 },
+        },
       ],
     });
 
+    /** Set rotation to 2PI to make it rotate clockwise.  */
     this._springRef.start({ rotation: PI_2 });
   }
   flipFaceDown() {
     if (!this._isFaceUp) return;
     this._isFaceUp = false;
 
+    const z = Math.max(this.position.z, this._targetPos.z);
     this._springRef.start({
       to: [
-        { z: this._targetPos.z + CARD_WIDTH_HALF },
-        { z: this._targetPos.z },
+        {
+          z: z + CARD_WIDTH_HALF,
+          /** Reduce friction a bit to speed up the animation. */
+          config: { precision: 1e-4, clamp: true, friction: 20 },
+        },
+        {
+          z: this._targetPos.z,
+          /** Reduce friction a bit to speed up the animation. */
+          config: { precision: 1e-4, clamp: true, friction: 20 },
+        },
       ],
     });
     this._springRef.start({ rotation: PI });
