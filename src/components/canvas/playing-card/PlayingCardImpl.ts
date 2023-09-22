@@ -62,19 +62,6 @@ export class PlayingCardImpl extends Object3D {
   }
 
   update(deltaTime) {
-    // const isMoving = damp3(
-    //   this.position,
-    //   this._targetPos,
-    //   SMOOTH_TIME,
-    //   deltaTime,
-    // );
-
-    // const isRotating = dampE(
-    //   this.rotation,
-    //   this._targetRotation,
-    //   SMOOTH_TIME,
-    //   deltaTime,
-    // );
     if (this.position.distanceTo(this._targetPos) < DISTANCE_THRESHOLD) {
       this.dispatchEvent({ type: 'REST' });
     }

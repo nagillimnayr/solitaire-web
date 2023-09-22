@@ -90,11 +90,17 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
     const handlePointerUp = useCallback((event: ThreeEvent<PointerEvent>) => {
       /**  */
       event.stopPropagation();
+      const card = localRef.current;
     }, []);
-    const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
-      /**  */
-      event.stopPropagation();
-    }, []);
+    const handleClick = useCallback(
+      (event: ThreeEvent<MouseEvent>) => {
+        /**  */
+        event.stopPropagation();
+        const card = localRef.current;
+        GameActor.send({ type: 'CLICK_CARD', card });
+      },
+      [GameActor],
+    );
 
     const userData = useMemo(() => ({ rank, suit }), [rank, suit]);
     const name = makePlayingCardName(rank, suit);

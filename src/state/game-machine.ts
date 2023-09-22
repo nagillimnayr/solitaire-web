@@ -49,9 +49,10 @@ type GameEvents =
   | { type: 'RETURN_WASTE' }
   | { type: 'DEAL_CARDS' }
   | { type: 'DRAW_CARD' }
-  | { type: 'PICKUP_CARD' }
+  | { type: 'PICKUP_CARD'; card: PlayingCardImpl }
   | { type: 'DROP_CARD' }
-  | { type: 'PLACE_CARD' };
+  | { type: 'PLACE_CARD' }
+  | { type: 'CLICK_CARD'; card: PlayingCardImpl };
 
 export const GameMachine = createMachine(
   {
@@ -141,6 +142,17 @@ export const GameMachine = createMachine(
               target: 'drawing',
             },
           ],
+          PICKUP_CARD: {
+            /** Only valid if card is face up. */
+            cond: (_, { card }) => card.isFaceUp,
+          },
+          DROP_CARD: {},
+          PLACE_CARD: {},
+          CLICK_CARD: {
+            cond: ({ stockPile }, { card }) =>
+              Object.is(card.currentPile, stockPile),
+            target: 'drawing',
+          },
         },
       },
       restarting: {
