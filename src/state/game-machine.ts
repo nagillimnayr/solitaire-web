@@ -157,15 +157,10 @@ export const GameMachine = createMachine(
             actions: ['logEvent', 'pickupCard', 'lockCameraControls'],
             target: 'carryingCards',
           },
-          DROP_CARD: {
-            cond: ({ carryPile }) => !carryPile.isEmpty(),
-            actions: ['unlockCameraControls'],
-            target: 'droppingCards',
-          },
-          PLACE_CARD: {},
           CLICK_CARD: {
             cond: ({ stockPile }, { card }) =>
               Object.is(card.currentPile, stockPile),
+            actions: ['logEvent'],
             target: 'drawing',
           },
         },
@@ -283,7 +278,12 @@ export const GameMachine = createMachine(
       carryingCards: {
         on: {
           DROP_CARD: {
+            cond: ({ carryPile }) => !carryPile.isEmpty(),
+            actions: ['logEvent', 'unlockCameraControls'],
             target: 'droppingCards',
+          },
+          PLACE_CARD: {
+            actions: ['logEvent'],
           },
         },
       },
