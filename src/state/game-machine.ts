@@ -15,6 +15,7 @@ import {
 import { Vector3 } from 'three';
 import { randInt } from 'three/src/math/MathUtils';
 import { Stack } from '@datastructures-js/stack';
+import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -31,9 +32,9 @@ type GameContext = {
   wastePile: WastePileImpl;
   foundationPiles: FoundationPileImpl[];
   tableauPiles: TableauPileImpl[];
+  carryPile: CarryPileImpl;
 
   splitPiles: SplitPiles; // Helper for shuffling the deck.
-  carryStack: Stack<PlayingCardImpl>;
 };
 
 type GameEvents =
@@ -42,6 +43,7 @@ type GameEvents =
   | { type: 'ASSIGN_WASTE'; wastePile: WastePileImpl }
   | { type: 'ASSIGN_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'ASSIGN_FOUNDATION'; foundationPile: FoundationPileImpl }
+  | { type: 'ASSIGN_CARRY_PILE'; carryPile: CarryPileImpl }
   | { type: 'INIT_CARD'; card: PlayingCardImpl }
 
   /** Game events. */
@@ -75,7 +77,7 @@ export const GameMachine = createMachine(
         pile2: new Array<PlayingCardImpl>(),
       },
 
-      carryStack: new Stack<PlayingCardImpl>(),
+      carryPile: null!,
     },
 
     on: {
@@ -106,6 +108,9 @@ export const GameMachine = createMachine(
             foundationPiles[foundationPile.suit] = foundationPile;
           },
         ],
+      },
+      ASSIGN_CARRY_PILE: {
+        actions: [assign({ carryPile: (_, { carryPile }) => carryPile })],
       },
       INIT_CARD: {
         actions: ['initCard'],
@@ -144,7 +149,9 @@ export const GameMachine = createMachine(
           ],
           PICKUP_CARD: {
             /** Only valid if card is face up. */
-            cond: (_, { card }) => card.isFaceUp,
+            cond: ({ carryPile }, { card }) =>
+              card.isFaceUp && !Object.is(card.currentPile, carryPile),
+            actions: ['logEvent', 'pickupCard'],
           },
           DROP_CARD: {},
           PLACE_CARD: {},
@@ -367,6 +374,18 @@ export const GameMachine = createMachine(
           const card = foundationPile.drawCard();
           card.addToPile(stockPile, false);
           return;
+        }
+      },
+      pickupCard: ({ carryPile }, { card }) => {
+        if (card.currentPile instanceof TableauPileImpl) {
+          const tableauPile = card.currentPile;
+          let card2: PlayingCardImpl;
+          do {
+            card2 = tableauPile.drawCard();
+            card2.addToPile(carryPile, true);
+          } while (!Object.is(card, card2));
+        } else {
+          card.addToPile(carryPile, true);
         }
       },
     },

@@ -50,6 +50,9 @@ export class PlayingCardImpl extends Object3D {
   get isFaceUp() {
     return this._isFaceUp;
   }
+  get previousPile() {
+    return this._previousPile;
+  }
   get currentPile() {
     return this._currentPile;
   }

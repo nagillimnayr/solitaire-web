@@ -15,6 +15,7 @@ import { Tableaus } from '../piles/Tableaus';
 import { Foundations } from '../piles/Foundations';
 import { GlobalStateContext } from '../../dom/providers/GlobalStateProvider';
 import { useKeyboard } from '@/hooks/usekeyboard';
+import { CarryPile } from '../piles/carry-pile/CarryPile';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -52,6 +53,7 @@ export const SolitaireGame = () => {
       <StockAndWaste position={STOCK_AND_WASTE_POS} />
       <Foundations position={FOUNDATIONS_POS} />
       <Tableaus position={TABLEAUS_POS} />
+      <CarryPile />
       {cards}
     </group>
   );
