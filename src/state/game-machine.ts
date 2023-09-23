@@ -320,7 +320,12 @@ export const GameMachine = createMachine(
 
                 return true;
               },
-              actions: ['logEvent', 'assignLastEvent', 'flipTableau'],
+              actions: [
+                'logEvent',
+                'assignLastEvent',
+                'flipTableau',
+                'unlockCameraControls',
+              ],
 
               target: 'placingOnTableau',
             },
@@ -353,7 +358,12 @@ export const GameMachine = createMachine(
                 /** Card underneath must be of rank one less than the card being placed. */
                 return topCard.rank === card.rank - 1;
               },
-              actions: ['logEvent', 'assignLastEvent', 'flipTableau'],
+              actions: [
+                'logEvent',
+                'assignLastEvent',
+                'flipTableau',
+                'unlockCameraControls',
+              ],
               target: 'placingOnFoundation',
             },
             {
@@ -505,15 +515,20 @@ export const GameMachine = createMachine(
 
         if (card.currentPile instanceof TableauPileImpl) {
           const tableauPile = card.currentPile;
-          let card2: PlayingCardImpl;
-          do {
-            card2 = tableauPile.drawCard();
+          const tempArr = new Array<PlayingCardImpl>();
+          while (!Object.is(tableauPile.peek(), card)) {
+            tempArr.push(tableauPile.drawCard());
+          }
+          _pos1.copy(intersection);
+          tempArr.push(tableauPile.drawCard());
+          tempArr.reverse();
+          while (tempArr.length > 0) {
+            const card2 = tempArr.pop();
             card2.addToPile(carryPile, true);
-            card2.moveTo(intersection);
-
-            intersection.z += Z_OFFSET * carryPile.count;
-            intersection.y -= Y_OFFSET * carryPile.count;
-          } while (!Object.is(card, card2));
+            _pos1.z = intersection.z + Z_OFFSET * tempArr.length;
+            _pos1.y = intersection.y - Y_OFFSET * tempArr.length;
+            card2.moveTo(_pos1);
+          }
         } else {
           card.currentPile.drawCard();
           card.addToPile(carryPile, true);
