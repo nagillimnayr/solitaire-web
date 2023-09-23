@@ -10,6 +10,7 @@ import {
   CARD_WIDTH_HALF_WITH_MARGIN,
   CARD_WIDTH_WITH_MARGIN,
   NUMBER_OF_CARDS,
+  Y_OFFSET,
   Z_OFFSET,
 } from '@/helpers/constants';
 import { Vector3 } from 'three';
@@ -301,6 +302,9 @@ export const GameMachine = createMachine(
                 const card = carryPile.peek();
                 const topCard = tableauPile.peek();
 
+                /** If Tableau is empty, move is only valid if card being placed is a King. */
+                if (!topCard) return card.rank === 12;
+
                 if (
                   /** Card must be face up. */
                   !topCard.isFaceUp ||
@@ -491,8 +495,6 @@ export const GameMachine = createMachine(
         }
       },
       pickupCard: ({ carryPile }, { card, intersection }) => {
-        // card.worldToLocal(intersection);
-        _pos1;
         intersection.subVectors(card.position, intersection);
 
         if (card.currentPile instanceof TableauPileImpl) {
@@ -502,6 +504,9 @@ export const GameMachine = createMachine(
             card2 = tableauPile.drawCard();
             card2.addToPile(carryPile, true);
             card2.moveTo(intersection);
+
+            intersection.z += Z_OFFSET * carryPile.count;
+            intersection.y -= Y_OFFSET * carryPile.count;
           } while (!Object.is(card, card2));
         } else {
           card.currentPile.drawCard();
