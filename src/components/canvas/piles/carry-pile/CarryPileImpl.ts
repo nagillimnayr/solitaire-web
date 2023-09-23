@@ -18,10 +18,10 @@ export class CarryPileImpl extends Pile {
 
     card.getWorldPosition(_pos1);
 
-    _pos3.copy(card.position);
-    _pos3.z = Z_OFFSET * this.count;
+    // _pos3.copy(card.position);
+    // _pos3.z = Z_OFFSET * this.count;
     this._pile.push(card);
-    _pos2.set(0, 0, 0);
+
     return card.moveTo(card.position);
     // return card.moveTo(_pos2);
   }
