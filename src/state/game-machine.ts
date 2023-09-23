@@ -302,6 +302,9 @@ export const GameMachine = createMachine(
                 const card = carryPile.peek();
                 const topCard = tableauPile.peek();
 
+                /** Don't place on previous pile. */
+                if (Object.is(card.previousPile, tableauPile)) return false;
+
                 /** If Tableau is empty, move is only valid if card being placed is a King. */
                 if (!topCard) return card.rank === 12;
 
@@ -336,6 +339,9 @@ export const GameMachine = createMachine(
                 if (carryPile.count > 1) return false;
 
                 const card = carryPile.peek();
+
+                /** Don't place on previous pile. */
+                if (Object.is(card.previousPile, foundationPile)) return false;
 
                 /** Must be same suit. */
                 if (foundationPile.suit !== card.suit) return false;
