@@ -69,7 +69,7 @@ export const SolitaireGame = () => {
       <Tableaus position={TABLEAUS_POS} />
       <CarryPile />
       {cards}
-      <PerspectiveCamera makeDefault position-z={0.5} />
+      <PerspectiveCamera makeDefault position-z={0.5} near={1e-3} />
       <CameraControls makeDefault />
       <ambientLight intensity={0.7} />
     </group>
