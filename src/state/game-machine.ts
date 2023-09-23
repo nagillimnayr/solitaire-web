@@ -176,15 +176,6 @@ export const GameMachine = createMachine(
             actions: ['logEvent', 'assignLastEvent'],
             target: 'drawing',
           },
-          AUTO_PLACE_CARD: {
-            cond: (_, { card }) => card.isFaceUp,
-            actions: [
-              'logEvent',
-              'assignLastEvent',
-              'autoPlaceCardOnFoundation',
-              'flipTableau',
-            ],
-          },
         },
       },
       restarting: {
@@ -360,6 +351,17 @@ export const GameMachine = createMachine(
             cond: 'carryPileNotEmpty',
             actions: ['dropCard'],
             target: 'droppingCards',
+          },
+        },
+        on: {
+          AUTO_PLACE_CARD: {
+            cond: (_, { card }) => card.isFaceUp,
+            actions: [
+              'logEvent',
+              'assignLastEvent',
+              'autoPlaceCardOnFoundation',
+              'flipTableau',
+            ],
           },
         },
       },
@@ -552,7 +554,7 @@ export const GameMachine = createMachine(
 
         if (foundationPile.canPlace(card)) {
           card.currentPile.drawCard();
-          card.addToPile(foundationPile);
+          card.addToPile(foundationPile, true);
         }
       },
     },

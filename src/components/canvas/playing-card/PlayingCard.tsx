@@ -130,6 +130,16 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       },
       [GameActor],
     );
+    const handleDoubleClick = useCallback(
+      (event: ThreeEvent<MouseEvent>) => {
+        /**  */
+        console.log('doubleClick');
+        event.stopPropagation();
+        const card = localRef.current;
+        GameActor.send({ type: 'AUTO_PLACE_CARD', card });
+      },
+      [GameActor],
+    );
 
     const userData = useMemo(() => ({ rank, suit }), [rank, suit]);
     const name = makePlayingCardName(rank, suit);
@@ -145,6 +155,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
       >
         <PlayingCardMaterial frontTexture={frontTexture} />
       </playingCardImpl>
