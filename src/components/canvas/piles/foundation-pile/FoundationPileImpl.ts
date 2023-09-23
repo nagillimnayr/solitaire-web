@@ -21,9 +21,8 @@ export class FoundationPileImpl extends Pile {
 
   addToPile(card: PlayingCardImpl) {
     this.getWorldPosition(_pos);
-    _pos.z += Z_OFFSET * this.count;
-
     this._pile.push(card);
+    _pos.z += Z_OFFSET * this.count;
 
     return card.moveTo(_pos);
   }
