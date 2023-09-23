@@ -14,7 +14,13 @@ import {
 } from 'react';
 import { useSpring, animated, useSpringRef } from '@react-spring/three';
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
-import { Object3DNode, ThreeEvent, extend, useFrame } from '@react-three/fiber';
+import {
+  Object3DNode,
+  ThreeEvent,
+  extend,
+  useFrame,
+  useThree,
+} from '@react-three/fiber';
 import { CardSpringRef, PlayingCardImpl } from './PlayingCardImpl';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { Vector3, Vector3Tuple } from 'three';
@@ -44,6 +50,7 @@ type PlayingCardProps = {
 const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
   ({ rank, suit }: PlayingCardProps, ref) => {
     const { GameActor } = useContext(GlobalStateContext);
+    const getThree = useThree(({ get }) => get);
 
     const frontTexture = usePlayingCardTexture(rank, suit);
 
@@ -94,6 +101,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       /**  */
       event.stopPropagation();
       const card = localRef.current;
+      console.log('intersections:', event.intersections);
     }, []);
     const handleClick = useCallback(
       (event: ThreeEvent<MouseEvent>) => {
@@ -116,17 +124,11 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         name={name}
         userData={userData}
         springRef={springRef}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onClick={handleClick}
       >
-        <RoundedRect
-          width={CARD_WIDTH}
-          height={CARD_HEIGHT}
-          radius={RADIUS}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          onClick={handleClick}
-        >
-          <PlayingCardMaterial frontTexture={frontTexture} />
-        </RoundedRect>
+        <PlayingCardMaterial frontTexture={frontTexture} />
       </playingCardImpl>
     );
   },

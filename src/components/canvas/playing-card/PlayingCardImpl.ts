@@ -1,5 +1,5 @@
 import { makePlayingCardName } from '@/helpers/playing-card-utils';
-import { Euler, Object3D, Vector3, Vector3Tuple } from 'three';
+import { Euler, Mesh, Object3D, Vector3, Vector3Tuple } from 'three';
 import { Pile } from '../piles/Pile';
 import {
   CARD_HEIGHT,
@@ -13,9 +13,12 @@ import {
 } from '@/helpers/constants';
 import { damp, damp3, dampE } from 'maath/easing';
 import { SpringRef } from '@react-spring/three';
+import { RoundedPlaneGeometry } from 'maath/geometry';
 
 const _pos = new Vector3();
 const DISTANCE_THRESHOLD = 0.001;
+
+const RADIUS = CARD_WIDTH * 0.04;
 
 export type CardSpringRef = SpringRef<{
   x: number;
@@ -24,7 +27,7 @@ export type CardSpringRef = SpringRef<{
   rotation: number;
 }>;
 
-export class PlayingCardImpl extends Object3D {
+export class PlayingCardImpl extends Mesh {
   private _rank: number;
   private _suit: number;
 
@@ -41,7 +44,7 @@ export class PlayingCardImpl extends Object3D {
   private _springRef: CardSpringRef = null!;
 
   constructor(rank: number, suit: number) {
-    super();
+    super(new RoundedPlaneGeometry(CARD_WIDTH, CARD_HEIGHT, RADIUS));
     this._rank = rank;
     this._suit = suit;
     this.name = makePlayingCardName(rank, suit);
