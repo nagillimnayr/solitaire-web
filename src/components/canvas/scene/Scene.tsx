@@ -1,8 +1,9 @@
 'use client';
 
 import { Canvas, CanvasProps } from '@react-three/fiber';
-import { Preload } from '@react-three/drei';
+import { Preload, CameraControls, PerspectiveCamera } from '@react-three/drei';
 import { r3f } from '@/helpers/global';
+import { SolitaireGame } from '../game/SolitaireGame';
 
 type SceneProps = Omit<CanvasProps, 'children'>;
 export default function Scene({ ...props }: SceneProps) {

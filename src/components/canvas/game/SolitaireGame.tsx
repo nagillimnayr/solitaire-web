@@ -18,6 +18,7 @@ import { useKeyboard } from '@/hooks/usekeyboard';
 import { CarryPile } from '../piles/carry-pile/CarryPile';
 import { useThree } from '@react-three/fiber';
 import { useEventListener } from 'usehooks-ts';
+import { CameraControls, PerspectiveCamera } from '@react-three/drei';
 
 const STOCK_AND_WASTE_POS = new Vector3(
   -CARD_WIDTH_HALF_WITH_MARGIN * 5,
@@ -68,6 +69,9 @@ export const SolitaireGame = () => {
       <Tableaus position={TABLEAUS_POS} />
       <CarryPile />
       {cards}
+      <PerspectiveCamera makeDefault position-z={0.5} />
+      <CameraControls makeDefault />
+      <ambientLight intensity={0.7} />
     </group>
   );
 };
