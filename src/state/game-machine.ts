@@ -313,7 +313,7 @@ export const GameMachine = createMachine(
 
                 return true;
               },
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: ['logEvent', 'assignLastEvent', 'flipTableau'],
 
               target: 'placingOnTableau',
             },
@@ -343,7 +343,7 @@ export const GameMachine = createMachine(
                 /** Card underneath must be of rank one less than the card being placed. */
                 return topCard.rank === card.rank - 1;
               },
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: ['logEvent', 'assignLastEvent', 'flipTableau'],
               target: 'placingOnFoundation',
             },
             {

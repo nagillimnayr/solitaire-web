@@ -24,6 +24,8 @@ import {
 import { CardSpringRef, PlayingCardImpl } from './PlayingCardImpl';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { Vector3, Vector3Tuple } from 'three';
+import { TableauPileImpl } from '../piles/tableau-pile/TableauPileImpl';
+import { FoundationPileImpl } from '../piles/foundation-pile/FoundationPileImpl';
 
 extend({ PlayingCardImpl });
 declare module '@react-three/fiber' {
@@ -97,12 +99,28 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       },
       [GameActor],
     );
-    // const handlePointerUp = useCallback((event: ThreeEvent<PointerEvent>) => {
-    //   /**  */
-    //   event.stopPropagation();
-    //   const card = localRef.current;
-    //   console.log('intersections:', event.intersections);
-    // }, []);
+    const handlePointerUp = useCallback(
+      (event: ThreeEvent<PointerEvent>) => {
+        /**  */
+        const card = localRef.current;
+        console.log('card:', card);
+        const currentPile = card.currentPile;
+        if (currentPile instanceof TableauPileImpl) {
+          event.stopPropagation();
+          GameActor.send({
+            type: 'PLACE_CARD_TABLEAU',
+            tableauPile: currentPile,
+          });
+        } else if (currentPile instanceof FoundationPileImpl) {
+          event.stopPropagation();
+          GameActor.send({
+            type: 'PLACE_CARD_FOUNDATION',
+            foundationPile: currentPile,
+          });
+        }
+      },
+      [GameActor],
+    );
     const handleClick = useCallback(
       (event: ThreeEvent<MouseEvent>) => {
         /**  */
@@ -125,7 +143,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         userData={userData}
         springRef={springRef}
         onPointerDown={handlePointerDown}
-        // onPointerUp={handlePointerUp}
+        onPointerUp={handlePointerUp}
         onClick={handleClick}
       >
         <PlayingCardMaterial frontTexture={frontTexture} />

@@ -18,7 +18,9 @@ export class TableauPileImpl extends Pile {
     return this._index;
   }
   get needsFlipping() {
-    return !this._pile.peek().isFaceUp;
+    const topCard = this._pile.peek();
+
+    return topCard ? !topCard.isFaceUp : false;
   }
 
   addToPile(card: PlayingCardImpl) {
