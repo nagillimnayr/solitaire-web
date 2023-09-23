@@ -331,7 +331,7 @@ export const GameMachine = createMachine(
             },
             {
               // cond: 'placeTableauInvalid',
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: ['logEvent', 'assignLastEvent', 'unlockCameraControls'],
               target: 'droppingCards',
             },
           ],
@@ -368,7 +368,7 @@ export const GameMachine = createMachine(
             },
             {
               // cond: 'placeFoundationInvalid',
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: ['logEvent', 'assignLastEvent', 'unlockCameraControls'],
               target: 'droppingCards',
             },
           ],
