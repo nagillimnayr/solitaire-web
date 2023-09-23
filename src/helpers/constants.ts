@@ -15,7 +15,7 @@ export const OUTLINE_BORDER_PADDING = 0.02 * CARD_WIDTH;
 
 export const SMOOTH_TIME = 0.25;
 export const Z_OFFSET = 1e-3;
-export const Y_OFFSET = CARD_HEIGHT * 0.1;
+export const Y_OFFSET = CARD_HEIGHT * 0.2;
 
 export const PILE_X_MARGIN = CARD_WIDTH * 0.1; // X-margin around piles.
 export const PILE_Y_MARGIN = CARD_HEIGHT * 0.1; // Y-margin around piles.
