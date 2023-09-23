@@ -8,6 +8,10 @@ import { PositionProps } from '@/helpers/props';
 import { FoundationPileImpl } from './FoundationPileImpl';
 import { Object3DNode, extend } from '@react-three/fiber';
 
+const dummyFn = () => {
+  return;
+};
+
 extend({ FoundationPileImpl });
 declare module '@react-three/fiber' {
   interface ThreeElements {
@@ -71,7 +75,7 @@ export const FoundationPile = ({ position, suit }: FoundationProps) => {
     >
       <MeshDiscardMaterial />
       <PileOutline />
-      <Center>
+      <Center onCentered={dummyFn}>
         <Svg
           src={SVG_URLS[suit]}
           fillMaterial={ICON_MATERIAL}
