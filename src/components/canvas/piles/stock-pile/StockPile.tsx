@@ -27,8 +27,16 @@ export const StockPile = ({ position }: StockProps) => {
     GameActor.send({ type: 'ASSIGN_STOCK', stockPile });
   }, [GameActor]);
 
+  const handleClick = useCallback(
+    (event: ThreeEvent<MouseEvent>) => {
+      event.stopPropagation();
+      GameActor.send({ type: 'DRAW_CARD' });
+    },
+    [GameActor],
+  );
+
   return (
-    <stockPileImpl ref={ref} position={position}>
+    <stockPileImpl ref={ref} position={position} onClick={handleClick}>
       <MeshDiscardMaterial />
       <PileOutline />
     </stockPileImpl>
