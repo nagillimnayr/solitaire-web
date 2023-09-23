@@ -46,9 +46,9 @@ export const FoundationPile = ({ position, suit }: FoundationProps) => {
       event.stopPropagation();
       const foundationPile = ref.current;
       console.log(`foundation ${suit}! Pointer up!`);
-      GameActor.send({ type: 'ATTEMPT_PLACE_FOUNDATION', foundationPile });
+      GameActor.send({ type: 'PLACE_CARD_FOUNDATION', foundationPile });
     },
-    [suit],
+    [GameActor, suit],
   );
   const handlePointerDown = useCallback((event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();

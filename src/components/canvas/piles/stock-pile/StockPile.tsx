@@ -1,7 +1,7 @@
 import { PositionProps } from '@/helpers/props';
 import { StockPileImpl } from './StockPileImpl';
-import { useContext, useEffect, useRef } from 'react';
-import { Object3DNode, extend } from '@react-three/fiber';
+import { useCallback, useContext, useEffect, useRef } from 'react';
+import { Object3DNode, ThreeEvent, extend } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { MeshDiscardMaterial } from '@react-three/drei';
 import { PileOutline } from '../PileOutline';

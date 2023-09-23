@@ -97,12 +97,12 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       },
       [GameActor],
     );
-    const handlePointerUp = useCallback((event: ThreeEvent<PointerEvent>) => {
-      /**  */
-      event.stopPropagation();
-      const card = localRef.current;
-      console.log('intersections:', event.intersections);
-    }, []);
+    // const handlePointerUp = useCallback((event: ThreeEvent<PointerEvent>) => {
+    //   /**  */
+    //   event.stopPropagation();
+    //   const card = localRef.current;
+    //   console.log('intersections:', event.intersections);
+    // }, []);
     const handleClick = useCallback(
       (event: ThreeEvent<MouseEvent>) => {
         /**  */
@@ -125,7 +125,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
         userData={userData}
         springRef={springRef}
         onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
+        // onPointerUp={handlePointerUp}
         onClick={handleClick}
       >
         <PlayingCardMaterial frontTexture={frontTexture} />

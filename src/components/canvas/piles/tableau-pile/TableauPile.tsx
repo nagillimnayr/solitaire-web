@@ -1,7 +1,7 @@
 import { PositionProps } from '@/helpers/props';
-import { useContext, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { TableauPileImpl } from './TableauPileImpl';
-import { Object3DNode, extend } from '@react-three/fiber';
+import { Object3DNode, ThreeEvent, extend } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { MeshDiscardMaterial } from '@react-three/drei';
 import { PileOutline } from '../PileOutline';
@@ -28,9 +28,24 @@ export const TableauPile = ({ position, index }: TableauProps) => {
     GameActor.send({ type: 'ASSIGN_TABLEAU', tableauPile });
   }, [GameActor]);
 
+  const handlePointerUp = useCallback(
+    (event: ThreeEvent<PointerEvent>) => {
+      event.stopPropagation();
+      const tableauPile = ref.current;
+      console.log(`tableau ${index}! Pointer up!`);
+      GameActor.send({ type: 'PLACE_CARD_TABLEAU', tableauPile });
+    },
+    [GameActor, index],
+  );
+
   const args: [number] = useMemo(() => [index], [index]);
   return (
-    <tableauPileImpl ref={ref} args={args} position={position}>
+    <tableauPileImpl
+      ref={ref}
+      args={args}
+      position={position}
+      onPointerUp={handlePointerUp}
+    >
       <MeshDiscardMaterial />
       <PileOutline />
     </tableauPileImpl>

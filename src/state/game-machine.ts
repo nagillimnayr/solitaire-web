@@ -18,6 +18,7 @@ import { Stack } from '@datastructures-js/stack';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
 import { RootState } from '@react-three/fiber';
 import { CameraControls } from 'three-stdlib';
+import { TableauPile } from '../components/canvas/piles/tableau-pile/TableauPile';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -27,17 +28,6 @@ const _pos2 = new Vector3();
 type SplitPiles = {
   pile1: PlayingCardImpl[];
   pile2: PlayingCardImpl[];
-};
-
-type GameContext = {
-  getThree: () => RootState;
-  stockPile: StockPileImpl;
-  wastePile: WastePileImpl;
-  foundationPiles: FoundationPileImpl[];
-  tableauPiles: TableauPileImpl[];
-  carryPile: CarryPileImpl;
-
-  splitPiles: SplitPiles; // Helper for shuffling the deck.
 };
 
 type GameEvents =
@@ -57,7 +47,22 @@ type GameEvents =
   | { type: 'PICKUP_CARD'; card: PlayingCardImpl; intersection: Vector3 }
   | { type: 'DROP_CARD' }
   | { type: 'PLACE_CARD' }
+  | { type: 'PLACE_CARD_TABLEAU'; tableauPile: TableauPileImpl }
+  | { type: 'PLACE_CARD_FOUNDATION'; foundationPile: FoundationPileImpl }
   | { type: 'CLICK_CARD'; card: PlayingCardImpl };
+
+type GameContext = {
+  getThree: () => RootState;
+  stockPile: StockPileImpl;
+  wastePile: WastePileImpl;
+  foundationPiles: FoundationPileImpl[];
+  tableauPiles: TableauPileImpl[];
+  carryPile: CarryPileImpl;
+
+  splitPiles: SplitPiles; // Helper for shuffling the deck.
+
+  lastEvent: GameEvents;
+};
 
 export const GameMachine = createMachine(
   {
@@ -76,12 +81,14 @@ export const GameMachine = createMachine(
       foundationPiles: new Array<FoundationPileImpl>(4),
       tableauPiles: new Array<TableauPileImpl>(7),
 
+      carryPile: null!,
+
       splitPiles: {
         pile1: new Array<PlayingCardImpl>(),
         pile2: new Array<PlayingCardImpl>(),
       },
 
-      carryPile: null!,
+      lastEvent: null!,
     },
 
     on: {
@@ -131,11 +138,11 @@ export const GameMachine = createMachine(
       idle: {
         on: {
           RESTART: {
-            actions: ['logEvent'],
+            actions: ['logEvent', 'assignLastEvent'],
             target: 'restarting',
           },
           RETURN_WASTE: {
-            actions: ['logEvent'],
+            actions: ['logEvent', 'assignLastEvent'],
             target: 'returningWaste',
           },
           DRAW_CARD: [
@@ -146,7 +153,7 @@ export const GameMachine = createMachine(
             },
             {
               cond: 'stockNotEmpty',
-              actions: ['logEvent'],
+              actions: ['logEvent', 'assignLastEvent'],
               target: 'drawing',
             },
           ],
@@ -154,13 +161,18 @@ export const GameMachine = createMachine(
             /** Only valid if card is face up. */
             cond: ({ carryPile }, { card }) =>
               card.isFaceUp && !Object.is(card.currentPile, carryPile),
-            actions: ['logEvent', 'pickupCard', 'lockCameraControls'],
+            actions: [
+              'logEvent',
+              'pickupCard',
+              'lockCameraControls',
+              'assignLastEvent',
+            ],
             target: 'carryingCards',
           },
           CLICK_CARD: {
             cond: ({ stockPile }, { card }) =>
               Object.is(card.currentPile, stockPile),
-            actions: ['logEvent'],
+            actions: ['logEvent', 'assignLastEvent'],
             target: 'drawing',
           },
         },
@@ -278,12 +290,68 @@ export const GameMachine = createMachine(
       carryingCards: {
         on: {
           DROP_CARD: {
-            actions: ['logEvent', 'unlockCameraControls'],
+            actions: ['logEvent', 'unlockCameraControls', 'assignLastEvent'],
             target: 'droppingCards',
           },
-          PLACE_CARD: {
-            actions: ['logEvent'],
-          },
+          /** Attempt to place card(s) on Tableau pile. */
+          PLACE_CARD_TABLEAU: [
+            {
+              // cond: 'placeTableauValid',
+              cond: ({ carryPile }, { tableauPile }) => {
+                const card = carryPile.peek();
+                const topCard = tableauPile.peek();
+
+                if (
+                  /** Card must be face up. */
+                  !topCard.isFaceUp ||
+                  /** If both even or both odd, return false. */
+                  card.suit % 2 === topCard.suit % 2 ||
+                  /** Card underneath must be one rank higher than the card we're placing on it. */
+                  topCard.rank !== card.rank + 1
+                )
+                  return false;
+
+                return true;
+              },
+              actions: ['logEvent', 'assignLastEvent'],
+
+              target: 'placingOnTableau',
+            },
+            {
+              // cond: 'placeTableauInvalid',
+              actions: ['logEvent', 'assignLastEvent'],
+              target: 'droppingCards',
+            },
+          ],
+          /** Attempt to place card on Foundation. */
+          PLACE_CARD_FOUNDATION: [
+            {
+              // cond: 'placeFoundationValid',
+              cond: ({ carryPile }, { foundationPile }) => {
+                /** Can only place one card at a time on the foundation. */
+                if (carryPile.count > 1) return false;
+
+                const card = carryPile.peek();
+
+                /** Must be same suit. */
+                if (foundationPile.suit !== card.suit) return false;
+
+                /** If no cards currently in the foundation, move is only valid if card being placed is an ace. */
+                if (foundationPile.count === 0) return card.rank === 0;
+
+                const topCard = foundationPile.peek();
+                /** Card underneath must be of rank one less than the card being placed. */
+                return topCard.rank === card.rank - 1;
+              },
+              actions: ['logEvent', 'assignLastEvent'],
+              target: 'placingOnFoundation',
+            },
+            {
+              // cond: 'placeFoundationInvalid',
+              actions: ['logEvent', 'assignLastEvent'],
+              target: 'droppingCards',
+            },
+          ],
         },
       },
       droppingCards: {
@@ -296,11 +364,33 @@ export const GameMachine = createMachine(
           },
         },
       },
+      placingOnTableau: {
+        after: {
+          200: { cond: 'carryPileIsEmpty', target: 'idle' },
+          50: {
+            cond: 'carryPileNotEmpty',
+            actions: ['placeOnTableau'],
+            target: 'placingOnTableau',
+          },
+        },
+      },
+      placingOnFoundation: {
+        after: {
+          200: { cond: 'carryPileIsEmpty', target: 'idle' },
+          50: {
+            cond: 'carryPileNotEmpty',
+            actions: ['placeOnFoundation'],
+            /** Can only place one card at a time on the foundation. */
+            target: 'idle',
+          },
+        },
+      },
     },
   },
   {
     actions: {
       logEvent: log((_, event) => event),
+      assignLastEvent: assign({ lastEvent: (_, event) => event }),
       initCard: ({ stockPile }, { card }) => {
         /** Add card to stock pile. */
         card.addToPile(stockPile);
@@ -430,6 +520,24 @@ export const GameMachine = createMachine(
       dropCard: ({ carryPile }) => {
         // const card = carryPile.drawCard();
         carryPile.dropCard();
+      },
+      placeOnTableau: ({ carryPile, lastEvent }) => {
+        if (lastEvent.type !== 'PLACE_CARD_TABLEAU') {
+          console.warn('ERROR: lastEvent must be PLACE_CARD_TABLEAU');
+          return;
+        }
+        const card = carryPile.drawCard();
+        const tableauPile = lastEvent.tableauPile;
+        card.addToPile(tableauPile, true);
+      },
+      placeOnFoundation: ({ carryPile, lastEvent }) => {
+        if (lastEvent.type !== 'PLACE_CARD_FOUNDATION') {
+          console.warn('ERROR: lastEvent must be PLACE_CARD_FOUNDATION');
+          return;
+        }
+        const card = carryPile.drawCard();
+        const foundationPile = lastEvent.foundationPile;
+        card.addToPile(foundationPile, true);
       },
     },
     delays: {

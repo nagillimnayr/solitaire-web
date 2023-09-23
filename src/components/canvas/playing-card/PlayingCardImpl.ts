@@ -50,6 +50,13 @@ export class PlayingCardImpl extends Mesh {
     this.name = makePlayingCardName(rank, suit);
   }
 
+  get rank() {
+    return this._rank;
+  }
+  get suit() {
+    return this._suit;
+  }
+
   get isFaceUp() {
     return this._isFaceUp;
   }

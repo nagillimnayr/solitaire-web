@@ -26,8 +26,10 @@ export class CarryPileImpl extends Pile {
     // return card.moveTo(_pos2);
   }
 
-  dropCard() {
-    const card = this.drawCard();
+  drawCard(): PlayingCardImpl {
+    if (this._pile.isEmpty()) return null;
+
+    const card = this._pile.pop();
 
     card.getWorldPosition(_pos1);
     this.getWorldPosition(_pos2);
@@ -35,7 +37,11 @@ export class CarryPileImpl extends Pile {
 
     this.parent?.attach(card);
 
-    // card.position.copy(_pos3);
+    return card;
+  }
+
+  dropCard() {
+    const card = this.drawCard();
 
     card.addToPile(card.previousPile, true);
   }
