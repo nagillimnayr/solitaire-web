@@ -335,19 +335,7 @@ export const GameMachine = createMachine(
                 if (carryPile.count > 1) return false;
 
                 const card = carryPile.peek();
-
-                /** Don't place on previous pile. */
-                if (Object.is(card.previousPile, foundationPile)) return false;
-
-                /** Must be same suit. */
-                if (foundationPile.suit !== card.suit) return false;
-
-                /** If no cards currently in the foundation, move is only valid if card being placed is an ace. */
-                if (foundationPile.count === 0) return card.rank === 0;
-
-                const topCard = foundationPile.peek();
-                /** Card underneath must be of rank one less than the card being placed. */
-                return topCard.rank === card.rank - 1;
+                return foundationPile.canPlace(card);
               },
               actions: [
                 'logEvent',

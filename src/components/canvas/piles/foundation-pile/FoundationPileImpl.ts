@@ -27,4 +27,19 @@ export class FoundationPileImpl extends Pile {
 
     return card.moveTo(_pos);
   }
+
+  canPlace(card: PlayingCardImpl) {
+    /** Don't place on previous pile. */
+    if (Object.is(card.previousPile, this)) return false;
+
+    /** Must be same suit. */
+    if (this.suit !== card.suit) return false;
+
+    /** If no cards currently in the foundation, move is only valid if card being placed is an ace. */
+    if (this.count === 0) return card.rank === 0;
+
+    const topCard = this.peek();
+    /** Card underneath must be of rank one less than the card being placed. */
+    return topCard.rank === card.rank - 1;
+  }
 }
