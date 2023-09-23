@@ -182,6 +182,7 @@ export const GameMachine = createMachine(
         after: {
           /** If stock pile is full, we're done returning the cards. Transition to dealing. */
           500: { cond: 'stockIsFull', target: 'splittingDeck' },
+          25: { actions: ['returnTableau', 'returnFoundation', 'returnWaste'] },
           50: [
             {
               /** Return cards from tableaus. */
@@ -471,7 +472,7 @@ export const GameMachine = createMachine(
       },
       returnWaste: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
-        card.addToPile(stockPile, false);
+        card?.addToPile(stockPile, false);
       },
       returnTableau: ({ stockPile, tableauPiles }) => {
         /** Return card from first non-empty pile. */
@@ -479,7 +480,6 @@ export const GameMachine = createMachine(
           if (!tableauPile.isEmpty()) {
             const card = tableauPile.drawCard();
             card.addToPile(stockPile, false);
-            return;
           }
         }
       },
@@ -489,7 +489,6 @@ export const GameMachine = createMachine(
           if (!foundationPile.isEmpty()) {
             const card = foundationPile.drawCard();
             card.addToPile(stockPile, false);
-            return;
           }
         }
       },
