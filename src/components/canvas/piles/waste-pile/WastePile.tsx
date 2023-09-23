@@ -3,6 +3,8 @@ import { WastePileImpl } from './WastePileImpl';
 import { useContext, useEffect, useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
+import { MeshDiscardMaterial } from '@react-three/drei';
+import { PileOutline } from '../PileOutline';
 
 extend({ WastePileImpl });
 declare module '@react-three/fiber' {
@@ -26,8 +28,9 @@ export const WastePile = ({ position }: WasteProps) => {
   }, [GameActor]);
 
   return (
-    <object3D position={position}>
-      <wastePileImpl ref={ref} />
-    </object3D>
+    <wastePileImpl ref={ref} position={position}>
+      <MeshDiscardMaterial />
+      <PileOutline />
+    </wastePileImpl>
   );
 };

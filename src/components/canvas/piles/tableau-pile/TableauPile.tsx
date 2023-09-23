@@ -3,6 +3,8 @@ import { useContext, useEffect, useMemo, useRef } from 'react';
 import { TableauPileImpl } from './TableauPileImpl';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
+import { MeshDiscardMaterial } from '@react-three/drei';
+import { PileOutline } from '../PileOutline';
 
 extend({ TableauPileImpl });
 declare module '@react-three/fiber' {
@@ -28,8 +30,9 @@ export const TableauPile = ({ position, index }: TableauProps) => {
 
   const args: [number] = useMemo(() => [index], [index]);
   return (
-    <object3D position={position}>
-      <tableauPileImpl ref={ref} args={args} />
-    </object3D>
+    <tableauPileImpl ref={ref} args={args} position={position}>
+      <MeshDiscardMaterial />
+      <PileOutline />
+    </tableauPileImpl>
   );
 };

@@ -3,6 +3,8 @@ import { StockPileImpl } from './StockPileImpl';
 import { useContext, useEffect, useRef } from 'react';
 import { Object3DNode, extend } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
+import { MeshDiscardMaterial } from '@react-three/drei';
+import { PileOutline } from '../PileOutline';
 
 extend({ StockPileImpl });
 declare module '@react-three/fiber' {
@@ -26,8 +28,9 @@ export const StockPile = ({ position }: StockProps) => {
   }, [GameActor]);
 
   return (
-    <object3D position={position}>
-      <stockPileImpl ref={ref} />
-    </object3D>
+    <stockPileImpl ref={ref} position={position}>
+      <MeshDiscardMaterial />
+      <PileOutline />
+    </stockPileImpl>
   );
 };
