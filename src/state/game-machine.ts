@@ -47,7 +47,7 @@ type GameEvents =
   | { type: 'DRAW_CARD' }
   | { type: 'PICKUP_CARD'; card: PlayingCardImpl; intersection: Vector3 }
   | { type: 'DROP_CARD' }
-  | { type: 'PLACE_CARD' }
+  | { type: 'AUTO_PLACE_CARD'; card: PlayingCardImpl }
   | { type: 'PLACE_CARD_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'PLACE_CARD_FOUNDATION'; foundationPile: FoundationPileImpl }
   | { type: 'CLICK_CARD'; card: PlayingCardImpl };
@@ -176,6 +176,15 @@ export const GameMachine = createMachine(
             actions: ['logEvent', 'assignLastEvent'],
             target: 'drawing',
           },
+          AUTO_PLACE_CARD: {
+            cond: (_, { card }) => card.isFaceUp,
+            actions: [
+              'logEvent',
+              'assignLastEvent',
+              'autoPlaceCardOnFoundation',
+              'flipTableau',
+            ],
+          },
         },
       },
       restarting: {
@@ -300,25 +309,7 @@ export const GameMachine = createMachine(
               // cond: 'placeTableauValid',
               cond: ({ carryPile }, { tableauPile }) => {
                 const card = carryPile.peek();
-                const topCard = tableauPile.peek();
-
-                /** Don't place on previous pile. */
-                if (Object.is(card.previousPile, tableauPile)) return false;
-
-                /** If Tableau is empty, move is only valid if card being placed is a King. */
-                if (!topCard) return card.rank === 12;
-
-                if (
-                  /** Card must be face up. */
-                  !topCard.isFaceUp ||
-                  /** If both even or both odd, return false. */
-                  card.suit % 2 === topCard.suit % 2 ||
-                  /** Card underneath must be one rank higher than the card we're placing on it. */
-                  topCard.rank !== card.rank + 1
-                )
-                  return false;
-
-                return true;
+                return tableauPile.canPlace(card);
               },
               actions: [
                 'logEvent',
@@ -566,6 +557,14 @@ export const GameMachine = createMachine(
         const card = carryPile.drawCard();
         const foundationPile = lastEvent.foundationPile;
         card.addToPile(foundationPile, true);
+      },
+      autoPlaceCardOnFoundation: ({ foundationPiles }, { card }) => {
+        if (card.currentPile instanceof FoundationPileImpl) return;
+        const foundationPile = foundationPiles[card.suit];
+
+        if (foundationPile.peek()) {
+        }
+        card.currentPile.drawCard();
       },
     },
     delays: {
