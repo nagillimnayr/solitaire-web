@@ -550,9 +550,10 @@ export const GameMachine = createMachine(
         if (card.currentPile instanceof FoundationPileImpl) return;
         const foundationPile = foundationPiles[card.suit];
 
-        if (foundationPile.peek()) {
+        if (foundationPile.canPlace(card)) {
+          card.currentPile.drawCard();
+          card.addToPile(foundationPile);
         }
-        card.currentPile.drawCard();
       },
     },
     delays: {

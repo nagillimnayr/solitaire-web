@@ -56,9 +56,9 @@ export class TableauPileImpl extends Pile {
 
     return (
       /** Card must be face up. */
-      topCard.isFaceUp ||
+      topCard.isFaceUp &&
       /** Cards must not be same color (Cannot be both even or both odd). */
-      card.suit % 2 !== topCard.suit % 2 ||
+      card.suit % 2 !== topCard.suit % 2 &&
       /** Card underneath must be one rank higher than the card we're placing on it. */
       topCard.rank === card.rank + 1
     );
