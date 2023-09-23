@@ -505,9 +505,11 @@ export const GameMachine = createMachine(
       returnFoundation: ({ stockPile, foundationPiles }) => {
         /** Return card from first non-empty pile. */
         for (const foundationPile of foundationPiles) {
-          const card = foundationPile.drawCard();
-          card.addToPile(stockPile, false);
-          return;
+          if (!foundationPile.isEmpty()) {
+            const card = foundationPile.drawCard();
+            card.addToPile(stockPile, false);
+            return;
+          }
         }
       },
       pickupCard: ({ carryPile }, { card, intersection }) => {
