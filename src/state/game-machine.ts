@@ -137,6 +137,7 @@ export const GameMachine = createMachine(
     /** States. */
     states: {
       idle: {
+        entry: ['unlockCameraControls'],
         on: {
           RESTART: {
             actions: ['logEvent', 'assignLastEvent'],
@@ -292,7 +293,7 @@ export const GameMachine = createMachine(
       carryingCards: {
         on: {
           DROP_CARD: {
-            actions: ['logEvent', 'unlockCameraControls', 'assignLastEvent'],
+            actions: ['logEvent', 'assignLastEvent'],
             target: 'droppingCards',
           },
           /** Attempt to place card(s) on Tableau pile. */
@@ -314,7 +315,7 @@ export const GameMachine = createMachine(
             },
             {
               // cond: 'placeTableauInvalid',
-              actions: ['logEvent', 'assignLastEvent', 'unlockCameraControls'],
+              actions: ['logEvent', 'assignLastEvent'],
               target: 'droppingCards',
             },
           ],
