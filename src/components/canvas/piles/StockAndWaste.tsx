@@ -16,7 +16,7 @@ const WASTE_POS = new Vector3(CARD_WIDTH_HALF_WITH_MARGIN, 0, 0);
 export const StockAndWaste = ({ position }: PositionProps) => {
   return (
     <group position={position}>
-      <axesHelper />
+      {/* <axesHelper /> */}
       <StockPile position={STOCK_POS} />
       <WastePile position={WASTE_POS} />
     </group>

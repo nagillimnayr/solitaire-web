@@ -23,7 +23,7 @@ const START_X_POS = -CARD_WIDTH_HALF_WITH_MARGIN * 3;
 export const Foundations = ({ position }: PositionProps) => {
   return (
     <group position={position}>
-      <axesHelper />
+      {/* <axesHelper /> */}
       {FOUNDATION_KEYS.map((uuid, index) => (
         <object3D
           key={uuid}

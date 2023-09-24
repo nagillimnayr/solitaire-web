@@ -62,7 +62,7 @@ export const SolitaireGame = () => {
 
   return (
     <group name='solitaire-game'>
-      <axesHelper />
+      {/* <axesHelper /> */}
       <Background />
       <StockAndWaste position={STOCK_AND_WASTE_POS} />
       <Foundations position={FOUNDATIONS_POS} />
