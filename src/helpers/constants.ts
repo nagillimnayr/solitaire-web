@@ -1,4 +1,4 @@
-import { MeshBasicMaterial } from 'three';
+import { MeshBasicMaterial, Vector3 } from 'three';
 
 export const NUMBER_OF_CARDS = 52;
 export const NUMBER_OF_RANKS = 13;
@@ -82,3 +82,11 @@ export const PI_OVER_2 = PI / 2;
 export const PI_OVER_3 = PI / 3;
 export const PI_OVER_4 = PI / 4;
 export const PI_OVER_6 = PI / 6;
+
+export const X_AXIS = Object.freeze(new Vector3(1, 0, 0));
+export const Y_AXIS = Object.freeze(new Vector3(0, 1, 0));
+export const Z_AXIS = Object.freeze(new Vector3(0, 0, 1));
+
+export const X_AXIS_NEG = Object.freeze(new Vector3(-1, 0, 0));
+export const Y_AXIS_NEG = Object.freeze(new Vector3(0, -1, 0));
+export const Z_AXIS_NEG = Object.freeze(new Vector3(0, 0, -1));
