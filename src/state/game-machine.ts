@@ -538,10 +538,12 @@ export const GameMachine = createMachine(
         }
       },
       lockCameraControls: ({ getThree }) => {
+        if (!getThree) return;
         const { controls } = getThree();
         (controls as unknown as CameraControls).enabled = false;
       },
       unlockCameraControls: ({ getThree }) => {
+        if (!getThree) return;
         const { controls } = getThree();
         (controls as unknown as CameraControls).enabled = true;
       },
