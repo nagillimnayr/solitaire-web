@@ -1,6 +1,6 @@
 import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
-import { Z_OFFSET } from '@/helpers/constants';
+import { NUMBER_OF_CARDS, Z_OFFSET } from '@/helpers/constants';
 import { Vector3 } from 'three';
 import { lerp } from 'three/src/math/MathUtils';
 
@@ -19,14 +19,7 @@ export class StockPileImpl extends Pile {
     return card.moveTo(_pos);
   }
 
-  shuffleDeck() {
-    //
-  }
-  dealCards() {
-    //
-  }
-
-  returnAllCardsToDeck() {
-    this.dispatchEvent({ type: 'RETURN_ALL_CARDS' });
+  isFull() {
+    return this.count === NUMBER_OF_CARDS;
   }
 }
