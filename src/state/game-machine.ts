@@ -363,6 +363,8 @@ export const GameMachine = createMachine(
               'autoPlaceCardOnFoundation',
               'flipTableau',
             ],
+            /** Check for win. */
+            target: 'checkingForWin',
           },
         },
       },
@@ -377,13 +379,30 @@ export const GameMachine = createMachine(
         },
       },
       placingOnFoundation: {
+        always: [
+          {
+            /** Only one card may be placed on foundation at a time. */
+            cond: ({ carryPile }) => carryPile.count !== 1,
+            target: 'droppingCards',
+          },
+          { actions: ['placeOnFoundation'] },
+        ],
+
         after: {
-          200: { cond: 'carryPileIsEmpty', target: 'idle' },
-          50: {
-            cond: 'carryPileNotEmpty',
-            actions: ['placeOnFoundation'],
-            /** Can only place one card at a time on the foundation. */
-            target: 'idle',
+          100:
+            /** Check for win. */
+            { target: 'checkingForWin' },
+        },
+      },
+      /** Check for win. */
+      checkingForWin: {
+        always: [{ cond: 'hasWon', target: 'won' }, { target: 'idle' }],
+      },
+      won: {
+        entry: [log('Game Won!!!')],
+        on: {
+          RESTART: {
+            target: 'restarting',
           },
         },
       },
@@ -632,6 +651,15 @@ export const GameMachine = createMachine(
       /** Carry Pile. */
       carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
       carryPileNotEmpty: ({ carryPile }) => !carryPile.isEmpty(),
+
+      /** Check for win. */
+      hasWon: ({ foundationPiles }) => {
+        /** Check if all foundations are full. */
+        for (const foundationPile of foundationPiles) {
+          if (!foundationPile.isFull()) return false;
+        }
+        return true;
+      },
     },
   },
 );
