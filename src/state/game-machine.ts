@@ -19,7 +19,9 @@ import { Stack } from '@datastructures-js/stack';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
 import { RootState } from '@react-three/fiber';
 import { CameraControls } from 'three-stdlib';
-import { TableauPile } from '../components/canvas/piles/tableau-pile/TableauPile';
+import { RestartMachine } from './restart-machine';
+import { DealMachine } from './deal-machine';
+import { flipTableau } from '../helpers/playing-card-utils';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -180,95 +182,33 @@ export const GameMachine = createMachine(
         },
       },
       restarting: {
-        after: {
-          /** If stock pile is full, we're done returning the cards. Transition to dealing. */
-          500: { cond: 'stockIsFull', target: 'splittingDeck' },
-          25: { actions: ['returnTableau', 'returnFoundation', 'returnWaste'] },
-          50: [
-            {
-              /** Return cards from tableaus. */
-              cond: 'tableausNotEmpty',
-              actions: ['returnTableau'],
-              target: 'restarting',
-            },
-            {
-              /** Return cards from foundations. */
-              cond: 'foundationsNotEmpty',
-              actions: ['returnFoundation'],
-              target: 'restarting',
-            },
-            {
-              /** Return cards from waste. */
-              cond: 'wasteNotEmpty',
-              actions: ['returnWaste'],
-              target: 'restarting',
-            },
-          ],
-        },
-      },
-      splittingDeck: {
-        after: {
-          250: {
-            /** Once the stockPile is empty, transition to shuffling. */
-            cond: 'stockIsEmpty',
-            target: 'shuffling',
+        /** Invoke RestartMachine. */
+        invoke: {
+          id: 'restart-machine',
+          src: RestartMachine,
+          data: {
+            stockPile: ({ stockPile }) => stockPile,
+            wastePile: ({ wastePile }) => wastePile,
+            tableauPiles: ({ tableauPiles }) => tableauPiles,
+            foundationPiles: ({ foundationPiles }) => foundationPiles,
           },
-          20: {
-            cond: 'stockNotEmpty',
-            // cond: ({ stockPile }) => stockPile.count > HALF_DECK_SIZE,
-            /** Take cards from the stockPile and add them to splitPiles.*/
-            actions: ['splitDeck'],
-            target: 'splittingDeck',
-          },
+          onDone: { target: 'dealing' },
         },
       },
 
-      shuffling: {
-        after: {
-          /** When stock is full again, transition to dealing. */
-          500: { cond: 'stockIsFull', target: 'dealing' },
-          20: {
-            cond: 'stockNotFull',
-            /** Add the cards back to the stockPile in a random order.*/
-            actions: ['shuffleDeck'],
-            target: 'shuffling',
-          },
-        },
-      },
       dealing: {
-        after: {
-          CARD_DELAY: [
-            {
-              /** If rightmost tableau has 7 cards, we're done dealing. Transition to flipping top cards of each tableau. */
-              cond: ({ tableauPiles }) => tableauPiles[6].count >= 7,
-              target: 'flippingTableaus',
-            },
-            {
-              actions: ['dealCard'],
-              /** Recursively self-transition after delay. */
-              target: 'dealing',
-            },
-          ],
+        /** Invoke DealMachine. */
+        invoke: {
+          id: 'deal-machine',
+          src: DealMachine,
+          data: {
+            stockPile: ({ stockPile }) => stockPile,
+            tableauPiles: ({ tableauPiles }) => tableauPiles,
+          },
+          onDone: { target: 'idle' },
         },
       },
-      flippingTableaus: {
-        after: {
-          100: {
-            /** Only execute if rightmost hasn't been flipped. */
-            cond: 'tableausNeedFlipping',
-            /** Flip next tableau. */
-            actions: ['flipTableau', log('Flip Tableau!')],
-            /** Recursively self-transition after delay. */
-            target: 'flippingTableaus',
-          },
-          500: {
-            /** If rightmost tableau is face-up, transition to idle. */
-            // cond: ({ tableauPiles }) => !tableauPiles[6].needsFlipping,
-            actions: [log('Done flipping tableaus.')],
-            target: 'idle',
-          },
-        },
-      },
+
       drawing: {
         invoke: {
           src: 'drawCard',
@@ -356,6 +296,7 @@ export const GameMachine = createMachine(
           },
         },
         on: {
+          /** NOTE: This is causing some bugs. */
           AUTO_PLACE_CARD: {
             cond: (_, { card }) => card.isFaceUp,
             actions: [
@@ -397,7 +338,30 @@ export const GameMachine = createMachine(
       },
       /** Check for win. */
       checkingForWin: {
-        always: [{ cond: 'hasWon', target: 'won' }, { target: 'idle' }],
+        always: [
+          { cond: 'hasWon', target: 'won' },
+          { cond: 'allFaceUp', target: 'autoWinning' },
+          { target: 'idle' },
+        ],
+      },
+      /** If all cards are flipped face up, game is essentially one. Auto place cards on foundation to speed things up. */
+      autoWinning: {
+        /** Invoke promise actor that will take control until all of the cards are in place. */
+        invoke: {
+          id: 'auto-win-actor',
+          src: (context, event, meta) => {
+            return new Promise((resolve) => {
+              const { tableauPiles, foundationPiles } = context;
+            });
+          },
+          onDone: {
+            target: 'won',
+          },
+        },
+        // after: {
+        //   200: { cond: 'hasWon', target: 'won' },
+        //   25: { actions: ['autoWin'], target: 'autoWinning' },
+        // },
       },
       won: {
         entry: [log('Game Won!!!')],
@@ -417,101 +381,16 @@ export const GameMachine = createMachine(
         /** Add card to stock pile. */
         card.addToPile(stockPile);
       },
-      splitDeck: ({ stockPile, splitPiles }) => {
-        /** Move two cards from stockPile to splitPiles. */
-        const { pile1, pile2 } = splitPiles;
-        const card1 = stockPile.drawCard();
-        const card2 = stockPile.drawCard();
 
-        stockPile.getWorldPosition(_pos1);
-        _pos1.x -= CARD_WIDTH_HALF_WITH_MARGIN;
-        _pos1.z += pile1.length * Z_OFFSET;
-
-        stockPile.getWorldPosition(_pos2);
-        _pos2.x += CARD_WIDTH_HALF_WITH_MARGIN;
-        _pos2.z += pile2.length * Z_OFFSET;
-
-        /** Randomize which card goes to which pile. */
-        const order = randInt(0, 1);
-        if (order === 1) {
-          pile1.push(card1);
-          card1.moveTo(_pos1);
-
-          pile2.push(card2);
-          card2.moveTo(_pos2);
-        } else {
-          pile1.push(card2);
-          card2.moveTo(_pos1);
-
-          pile2.push(card1);
-          card1.moveTo(_pos2);
-        }
-      },
-      shuffleDeck: ({ stockPile, splitPiles }) => {
-        const { pile1, pile2 } = splitPiles;
-
-        /** Randomly select a card from each split pile. */
-        const index1 = randInt(0, pile1.length - 1);
-        const index2 = randInt(0, pile2.length - 1);
-        const card1 = pile1[index1];
-        const card2 = pile2[index2];
-
-        /** And the cards to stockPile and randomize which one gets added first. */
-        const order = randInt(0, 1);
-        if (order === 0) {
-          card1.addToPile(stockPile);
-          card2.addToPile(stockPile);
-        } else {
-          card2.addToPile(stockPile);
-          card1.addToPile(stockPile);
-        }
-
-        /** Remove the cards from split piles. */
-        pile1.splice(index1, 1);
-        pile2.splice(index2, 1);
-      },
-      dealCard: ({ stockPile, tableauPiles }) => {
-        for (let i = 0; i < tableauPiles.length; ++i) {
-          const tableauPile = tableauPiles[i];
-          if (tableauPile.count < i + 1) {
-            const card = stockPile.drawCard();
-            card.addToPile(tableauPile);
-            return;
-          }
-        }
-      },
-      flipTableau: ({ tableauPiles }) => {
-        /** Iterate through tableaus and flip the first one that isn't face up. */
-
-        for (const tableauPile of tableauPiles) {
-          if (tableauPile.needsFlipping) {
-            tableauPile.flipTopCard();
-            return;
-          }
-        }
-      },
       returnWaste: ({ stockPile, wastePile }) => {
         const card = wastePile.drawCard();
         card?.addToPile(stockPile, false);
       },
-      returnTableau: ({ stockPile, tableauPiles }) => {
-        /** Return card from first non-empty pile. */
-        for (const tableauPile of tableauPiles) {
-          if (!tableauPile.isEmpty()) {
-            const card = tableauPile.drawCard();
-            card.addToPile(stockPile, false);
-          }
-        }
+
+      flipTableau: ({ tableauPiles }) => {
+        flipTableau(tableauPiles);
       },
-      returnFoundation: ({ stockPile, foundationPiles }) => {
-        /** Return card from first non-empty pile. */
-        for (const foundationPile of foundationPiles) {
-          if (!foundationPile.isEmpty()) {
-            const card = foundationPile.drawCard();
-            card.addToPile(stockPile, false);
-          }
-        }
-      },
+
       pickupCard: ({ carryPile }, { card, intersection }) => {
         intersection.subVectors(card.position, intersection);
 
@@ -596,8 +475,8 @@ export const GameMachine = createMachine(
     },
     guards: {
       /** Stock. */
-      stockIsFull: ({ stockPile }) => stockPile.count === NUMBER_OF_CARDS,
-      stockNotFull: ({ stockPile }) => stockPile.count !== NUMBER_OF_CARDS,
+      // stockIsFull: ({ stockPile }) => stockPile.isFull(),
+      // stockNotFull: ({ stockPile }) => !stockPile.isFull(),
       stockIsEmpty: ({ stockPile }) => stockPile.isEmpty(),
       stockNotEmpty: ({ stockPile }) => !stockPile.isEmpty(),
 
@@ -605,55 +484,17 @@ export const GameMachine = createMachine(
       wasteIsEmpty: ({ wastePile }) => wastePile.isEmpty(),
       wasteNotEmpty: ({ wastePile }) => !wastePile.isEmpty(),
 
-      /** Tableaus. */
-      // tableausAreEmpty: ({ tableauPiles }) => {
-      //   /** If any piles are not empty, return false. */
-      //   for (const tableauPile of tableauPiles) {
-      //     if (!tableauPile.isEmpty()) return false;
-      //   }
-      //   return true;
-      // },
-      tableausNotEmpty: ({ tableauPiles }) => {
-        /** If any piles are not empty, return true. */
-        for (const tableauPile of tableauPiles) {
-          if (!tableauPile.isEmpty()) return true;
-        }
-        return false;
-      },
-      tableausNeedFlipping: ({ tableauPiles }) => {
-        /** If any piles need flipping, return true. */
-        for (const tableauPile of tableauPiles) {
-          if (tableauPile.needsFlipping) return true;
-        }
-        return false;
-      },
-      // tableausDontNeedFlipping: ({ tableauPiles }) => {
-      //   /** If any piles need flipping, return false. */
-      //   for (const tableauPile of tableauPiles) {
-      //     if (tableauPile.needsFlipping) return false;
-      //   }
-      //   return true;
-      // },
-
-      /** Foundations. */
-      // foundationsAreEmpty: ({ foundationPiles }) => {
-      //   /** If any piles are not empty, return false. */
-      //   for (const foundationPile of foundationPiles) {
-      //     if (!foundationPile.isEmpty()) return false;
-      //   }
-      //   return true;
-      // },
-      foundationsNotEmpty: ({ foundationPiles }) => {
-        /** If any piles are not empty, return true. */
-        for (const foundationPile of foundationPiles) {
-          if (!foundationPile.isEmpty()) return true;
-        }
-        return false;
-      },
-
       /** Carry Pile. */
       carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
       carryPileNotEmpty: ({ carryPile }) => !carryPile.isEmpty(),
+
+      /** Check if all cards have been uncovered. */
+      allFaceUp: ({ tableauPiles }) => {
+        for (const tableauPile of tableauPiles) {
+          if (!tableauPile.isAllFaceUp()) return false;
+        }
+        return true;
+      },
 
       /** Check for win. */
       hasWon: ({ foundationPiles }) => {
@@ -666,5 +507,3 @@ export const GameMachine = createMachine(
     },
   },
 );
-
-export const useGameStore = create(xstate(GameMachine));
