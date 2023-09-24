@@ -27,7 +27,7 @@ export const DealMachine = createMachine(
 
     context: {
       stockPile: null!,
-      tableauPiles: new Array<TableauPileImpl>(7),
+      tableauPiles: null!,
     },
 
     initial: 'shuffling',
