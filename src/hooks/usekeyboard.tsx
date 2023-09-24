@@ -7,10 +7,14 @@ export function useKeyboard() {
   useEventListener('keypress', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    // console.log(event.code);
+    console.log(event.code);
     switch (event.code) {
       case 'Space': {
         GameActor.send({ type: 'DRAW_CARD' });
+        break;
+      }
+      case 'KeyS': {
+        console.log('State:', GameActor.getSnapshot()!.value);
         break;
       }
     }
