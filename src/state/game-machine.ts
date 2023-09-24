@@ -22,6 +22,8 @@ import { CameraControls } from 'three-stdlib';
 import { RestartMachine } from './restart-machine';
 import { DealMachine } from './deal-machine';
 import { flipTableau } from '../helpers/playing-card-utils';
+import { ReturnWasteMachine } from './return-waste-machine';
+import { AutoWinMachine } from './auto-win-machine';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -216,18 +218,14 @@ export const GameMachine = createMachine(
         },
       },
       returningWaste: {
-        after: {
-          /** If waste pile is empty, transition to idle. */
-          300: {
-            cond: 'wasteIsEmpty',
-            target: 'idle',
+        invoke: {
+          id: 'return-waste-actor',
+          src: ReturnWasteMachine,
+          data: {
+            stockPile: ({ stockPile }) => stockPile,
+            wastePile: ({ wastePile }) => wastePile,
           },
-          CARD_DELAY: {
-            cond: 'wasteNotEmpty',
-            actions: ['returnWaste'],
-            /** Recursively self-transition after delay. */
-            target: 'returningWaste',
-          },
+          onDone: { target: 'idle' },
         },
       },
       carryingCards: {
@@ -349,19 +347,17 @@ export const GameMachine = createMachine(
         /** Invoke promise actor that will take control until all of the cards are in place. */
         invoke: {
           id: 'auto-win-actor',
-          src: (context, event, meta) => {
-            return new Promise((resolve) => {
-              const { tableauPiles, foundationPiles } = context;
-            });
+          src: AutoWinMachine,
+          data: {
+            stockPile: ({ stockPile }) => stockPile,
+            wastePile: ({ wastePile }) => wastePile,
+            tableauPiles: ({ tableauPiles }) => tableauPiles,
+            foundationPiles: ({ foundationPiles }) => foundationPiles,
           },
           onDone: {
             target: 'won',
           },
         },
-        // after: {
-        //   200: { cond: 'hasWon', target: 'won' },
-        //   25: { actions: ['autoWin'], target: 'autoWinning' },
-        // },
       },
       won: {
         entry: [log('Game Won!!!')],
@@ -380,11 +376,6 @@ export const GameMachine = createMachine(
       initCard: ({ stockPile }, { card }) => {
         /** Add card to stock pile. */
         card.addToPile(stockPile);
-      },
-
-      returnWaste: ({ stockPile, wastePile }) => {
-        const card = wastePile.drawCard();
-        card?.addToPile(stockPile, false);
       },
 
       flipTableau: ({ tableauPiles }) => {
@@ -481,8 +472,8 @@ export const GameMachine = createMachine(
       stockNotEmpty: ({ stockPile }) => !stockPile.isEmpty(),
 
       /** Waste. */
-      wasteIsEmpty: ({ wastePile }) => wastePile.isEmpty(),
-      wasteNotEmpty: ({ wastePile }) => !wastePile.isEmpty(),
+      // wasteIsEmpty: ({ wastePile }) => wastePile.isEmpty(),
+      // wasteNotEmpty: ({ wastePile }) => !wastePile.isEmpty(),
 
       /** Carry Pile. */
       carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
