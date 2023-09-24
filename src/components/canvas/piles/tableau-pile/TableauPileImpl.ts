@@ -63,4 +63,13 @@ export class TableauPileImpl extends Pile {
       topCard.rank === card.rank + 1
     );
   }
+
+  /** Check if any cards are still face down. */
+  isAllFaceUp(): boolean {
+    if (this.isEmpty()) return true;
+    const pile = this._pile.toArray();
+
+    /** If bottom card is face up, then they must all be face up. */
+    return pile.at(0).isFaceUp;
+  }
 }
