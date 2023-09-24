@@ -1,6 +1,6 @@
 import { Pile } from '@/components/canvas/piles/Pile';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
-import { SUITS, Suit, Z_OFFSET } from '@/helpers/constants';
+import { NUMBER_OF_RANKS, SUITS, Suit, Z_OFFSET } from '@/helpers/constants';
 import { Vector3 } from 'three';
 import { lerp } from 'three/src/math/MathUtils';
 
@@ -40,5 +40,10 @@ export class FoundationPileImpl extends Pile {
     const topCard = this.peek();
     /** Card underneath must be of rank one less than the card being placed. */
     return topCard.rank === card.rank - 1;
+  }
+
+  /** Check if foundation is full. */
+  isFull() {
+    return this.count === NUMBER_OF_RANKS;
   }
 }
