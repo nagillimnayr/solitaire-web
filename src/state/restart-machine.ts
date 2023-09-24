@@ -4,16 +4,9 @@ import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauP
 import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
-import {
-  CARD_WIDTH_HALF_WITH_MARGIN,
-  CARD_WIDTH_WITH_MARGIN,
-  NUMBER_OF_CARDS,
-  Y_OFFSET,
-  Z_OFFSET,
-} from '@/helpers/constants';
-import { ContextFrom, assign, choose, createMachine, log } from 'xstate';
+import { createMachine, log } from 'xstate';
 import { Vector3 } from 'three';
-import { randInt } from 'three/src/math/MathUtils';
+
 const _pos1 = new Vector3();
 const _pos2 = new Vector3();
 
@@ -33,12 +26,12 @@ export const RestartMachine = createMachine(
     tsTypes: {} as import('./restart-machine.typegen').Typegen0,
     id: 'restart-machine',
 
-    context: () => ({
+    context: {
       stockPile: null!,
       wastePile: null!,
-      tableauPiles: new Array<TableauPileImpl>(7),
-      foundationPiles: new Array<FoundationPileImpl>(4),
-    }),
+      tableauPiles: null!,
+      foundationPiles: null!,
+    },
 
     initial: 'restarting',
     states: {
