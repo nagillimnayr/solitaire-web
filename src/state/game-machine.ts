@@ -25,6 +25,7 @@ import { DealMachine } from './deal-machine';
 import { flipTableau } from '../helpers/playing-card-utils';
 import { ReturnWasteMachine } from './return-waste-machine';
 import { AutoWinMachine } from './auto-win-machine';
+import { DropCardMachine } from './drop-card-machine';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -202,18 +203,6 @@ export const GameMachine = createMachine(
               ],
               target: 'drawing',
             },
-            // {
-            //   cond: (_, { card }) =>
-            //     card.isFaceUp && Object.is(card, card.currentPile.peek()),
-            //   actions: [
-            //     'logEvent',
-            //     'assignLastEvent',
-            //     'autoPlaceCardOnFoundation',
-            //     'flipTableau',
-            //   ],
-            //   /** Check for win. */
-            //   target: 'checkingForWin',
-            // },
           ],
         },
       },
@@ -252,6 +241,7 @@ export const GameMachine = createMachine(
         },
       },
       returningWaste: {
+        /** Invoke ReturnWasteActor. */
         invoke: {
           id: 'return-waste-actor',
           src: ReturnWasteMachine,
@@ -326,13 +316,21 @@ export const GameMachine = createMachine(
         },
       },
       droppingCards: {
-        after: {
-          200: { cond: 'carryPileIsEmpty', target: 'idle' },
-          50: {
-            cond: 'carryPileNotEmpty',
-            actions: ['dropCard'],
-            target: 'droppingCards',
+        // after: {
+        //   200: { cond: 'carryPileIsEmpty', target: 'idle' },
+        //   25: {
+        //     cond: 'carryPileNotEmpty',
+        //     actions: ['dropCard'],
+        //     target: 'droppingCards',
+        //   },
+        // },
+        invoke: {
+          id: 'drop-card-actor',
+          src: DropCardMachine,
+          data: {
+            carryPile: ({ carryPile }) => carryPile,
           },
+          onDone: { target: 'idle' },
         },
         on: {
           DOUBLE_CLICK_CARD: {
@@ -453,10 +451,10 @@ export const GameMachine = createMachine(
         (controls as unknown as CameraControls).cancel();
       },
 
-      dropCard: ({ carryPile }) => {
-        // const card = carryPile.drawCard();
-        carryPile.dropCard();
-      },
+      // dropCard: ({ carryPile }) => {
+      //   // const card = carryPile.drawCard();
+      //   carryPile.dropCard();
+      // },
       placeOnTableau: ({ carryPile, lastEvent }) => {
         if (lastEvent.type !== 'PLACE_CARD_TABLEAU') {
           console.warn('ERROR: lastEvent must be PLACE_CARD_TABLEAU');
@@ -495,10 +493,6 @@ export const GameMachine = createMachine(
         const card = stockPile.drawCard();
         return card.addToPile(wastePile, true);
       },
-      // returnWasteToDeck: ({ stockPile, wastePile }) => {
-      //   const card = wastePile.drawCard();
-      //   return card.addToPile(stockPile, false);
-      // },
     },
     guards: {
       /** Stock. */
