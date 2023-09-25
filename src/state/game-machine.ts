@@ -144,11 +144,17 @@ export const GameMachine = createMachine(
         entry: ['unlockCameraControls'],
         on: {
           RESTART: {
-            actions: ['logEvent', 'assignLastEvent'],
+            actions: [
+              // 'logEvent',
+              'assignLastEvent',
+            ],
             target: 'restarting',
           },
           RETURN_WASTE: {
-            actions: ['logEvent', 'assignLastEvent'],
+            actions: [
+              // 'logEvent',
+              'assignLastEvent',
+            ],
             target: 'returningWaste',
           },
           DRAW_CARD: [
@@ -159,7 +165,10 @@ export const GameMachine = createMachine(
             },
             {
               cond: 'stockNotEmpty',
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: [
+                // 'logEvent',
+                'assignLastEvent',
+              ],
               target: 'drawing',
             },
           ],
@@ -168,7 +177,7 @@ export const GameMachine = createMachine(
             cond: ({ carryPile }, { card }) =>
               card.isFaceUp && !Object.is(card.currentPile, carryPile),
             actions: [
-              'logEvent',
+              // 'logEvent',
               'pickupCard',
               'lockCameraControls',
               'assignLastEvent',
@@ -178,7 +187,10 @@ export const GameMachine = createMachine(
           CLICK_CARD: {
             cond: ({ stockPile }, { card }) =>
               Object.is(card.currentPile, stockPile),
-            actions: ['logEvent', 'assignLastEvent'],
+            actions: [
+              // 'logEvent',
+              'assignLastEvent',
+            ],
             target: 'drawing',
           },
         },
@@ -231,7 +243,10 @@ export const GameMachine = createMachine(
       carryingCards: {
         on: {
           DROP_CARD: {
-            actions: ['logEvent', 'assignLastEvent'],
+            actions: [
+              // 'logEvent',
+              'assignLastEvent',
+            ],
             target: 'droppingCards',
           },
           /** Attempt to place card(s) on Tableau pile. */
@@ -243,7 +258,7 @@ export const GameMachine = createMachine(
                 return tableauPile.canPlace(card);
               },
               actions: [
-                'logEvent',
+                // 'logEvent',
                 'assignLastEvent',
                 'flipTableau',
                 'unlockCameraControls',
@@ -253,7 +268,10 @@ export const GameMachine = createMachine(
             },
             {
               // cond: 'placeTableauInvalid',
-              actions: ['logEvent', 'assignLastEvent'],
+              actions: [
+                // 'logEvent',
+                'assignLastEvent',
+              ],
               target: 'droppingCards',
             },
           ],
@@ -269,7 +287,7 @@ export const GameMachine = createMachine(
                 return foundationPile.canPlace(card);
               },
               actions: [
-                'logEvent',
+                // 'logEvent',
                 'assignLastEvent',
                 'flipTableau',
                 'unlockCameraControls',
@@ -278,7 +296,11 @@ export const GameMachine = createMachine(
             },
             {
               // cond: 'placeFoundationInvalid',
-              actions: ['logEvent', 'assignLastEvent', 'unlockCameraControls'],
+              actions: [
+                // 'logEvent',
+                'assignLastEvent',
+                'unlockCameraControls',
+              ],
               target: 'droppingCards',
             },
           ],
@@ -298,7 +320,7 @@ export const GameMachine = createMachine(
           AUTO_PLACE_CARD: {
             cond: (_, { card }) => card.isFaceUp,
             actions: [
-              'logEvent',
+              // 'logEvent',
               'assignLastEvent',
               'autoPlaceCardOnFoundation',
               'flipTableau',
