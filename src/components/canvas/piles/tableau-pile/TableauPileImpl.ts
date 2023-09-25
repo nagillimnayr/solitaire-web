@@ -70,6 +70,7 @@ export class TableauPileImpl extends Pile {
     const pile = this._pile.toArray();
 
     /** If bottom card is face up, then they must all be face up. */
-    return pile.at(0).isFaceUp;
+
+    return pile[0].isFaceUp;
   }
 }
