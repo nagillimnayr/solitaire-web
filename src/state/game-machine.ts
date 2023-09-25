@@ -332,7 +332,7 @@ export const GameMachine = createMachine(
       },
       placingOnTableau: {
         after: {
-          200: { cond: 'carryPileIsEmpty', target: 'idle' },
+          200: { cond: 'carryPileIsEmpty', target: 'checkingForWin' },
           50: {
             cond: 'carryPileNotEmpty',
             actions: ['placeOnTableau'],
