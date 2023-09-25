@@ -347,13 +347,12 @@ export const GameMachine = createMachine(
             cond: ({ carryPile }) => carryPile.count !== 1,
             target: 'droppingCards',
           },
-          { actions: ['placeOnFoundation'] },
         ],
 
         after: {
-          100:
+          25:
             /** Check for win. */
-            { target: 'checkingForWin' },
+            { actions: ['placeOnFoundation'], target: 'checkingForWin' },
         },
       },
       /** Check for win. */
