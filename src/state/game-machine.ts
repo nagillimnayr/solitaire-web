@@ -18,7 +18,8 @@ import { randInt } from 'three/src/math/MathUtils';
 import { Stack } from '@datastructures-js/stack';
 import { CarryPileImpl } from '@/components/canvas/piles/carry-pile/CarryPileImpl';
 import { RootState } from '@react-three/fiber';
-import { CameraControls } from 'three-stdlib';
+// import { CameraControls } from 'three-stdlib';
+import { type CameraControls } from '@react-three/drei';
 import { RestartMachine } from './restart-machine';
 import { DealMachine } from './deal-machine';
 import { flipTableau } from '../helpers/playing-card-utils';
@@ -54,7 +55,8 @@ type GameEvents =
   | { type: 'AUTO_PLACE_CARD'; card: PlayingCardImpl }
   | { type: 'PLACE_CARD_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'PLACE_CARD_FOUNDATION'; foundationPile: FoundationPileImpl }
-  | { type: 'CLICK_CARD'; card: PlayingCardImpl };
+  | { type: 'CLICK_CARD'; card: PlayingCardImpl }
+  | { type: 'DOUBLE_CLICK_CARD'; card: PlayingCardImpl };
 
 type GameContext = {
   getThree: () => RootState;
@@ -141,7 +143,6 @@ export const GameMachine = createMachine(
     /** States. */
     states: {
       idle: {
-        entry: ['unlockCameraControls'],
         on: {
           RESTART: {
             actions: [
@@ -172,27 +173,48 @@ export const GameMachine = createMachine(
               target: 'drawing',
             },
           ],
+          DROP_CARD: [
+            {
+              cond: 'carryPileNotEmpty',
+              target: 'droppingCards',
+            },
+          ],
           PICKUP_CARD: {
             /** Only valid if card is face up. */
             cond: ({ carryPile }, { card }) =>
               card.isFaceUp && !Object.is(card.currentPile, carryPile),
             actions: [
-              // 'logEvent',
+              'logEvent',
               'pickupCard',
-              'lockCameraControls',
+              'cancelCameraDrag',
               'assignLastEvent',
             ],
             target: 'carryingCards',
           },
-          CLICK_CARD: {
-            cond: ({ stockPile }, { card }) =>
-              Object.is(card.currentPile, stockPile),
-            actions: [
-              // 'logEvent',
-              'assignLastEvent',
-            ],
-            target: 'drawing',
-          },
+          CLICK_CARD: [
+            {
+              /** If card is in stock pile, draw a card. */
+              cond: ({ stockPile }, { card }) =>
+                Object.is(card.currentPile, stockPile),
+              actions: [
+                // 'logEvent',
+                'assignLastEvent',
+              ],
+              target: 'drawing',
+            },
+            // {
+            //   cond: (_, { card }) =>
+            //     card.isFaceUp && Object.is(card, card.currentPile.peek()),
+            //   actions: [
+            //     'logEvent',
+            //     'assignLastEvent',
+            //     'autoPlaceCardOnFoundation',
+            //     'flipTableau',
+            //   ],
+            //   /** Check for win. */
+            //   target: 'checkingForWin',
+            // },
+          ],
         },
       },
       restarting: {
@@ -261,7 +283,6 @@ export const GameMachine = createMachine(
                 // 'logEvent',
                 'assignLastEvent',
                 'flipTableau',
-                'unlockCameraControls',
               ],
 
               target: 'placingOnTableau',
@@ -290,7 +311,6 @@ export const GameMachine = createMachine(
                 // 'logEvent',
                 'assignLastEvent',
                 'flipTableau',
-                'unlockCameraControls',
               ],
               target: 'placingOnFoundation',
             },
@@ -299,7 +319,6 @@ export const GameMachine = createMachine(
               actions: [
                 // 'logEvent',
                 'assignLastEvent',
-                'unlockCameraControls',
               ],
               target: 'droppingCards',
             },
@@ -316,12 +335,10 @@ export const GameMachine = createMachine(
           },
         },
         on: {
-          /** NOTE: This is causing some bugs. */
-          AUTO_PLACE_CARD: {
-            cond: (_, { card }) =>
-              card.isFaceUp && Object.is(card, card.currentPile.peek()),
+          DOUBLE_CLICK_CARD: {
+            cond: 'canAutoPlace',
             actions: [
-              // 'logEvent',
+              'logEvent',
               'assignLastEvent',
               'autoPlaceCardOnFoundation',
               'flipTableau',
@@ -429,16 +446,13 @@ export const GameMachine = createMachine(
           card.moveTo(intersection);
         }
       },
-      lockCameraControls: ({ getThree }) => {
+      cancelCameraDrag: ({ getThree }) => {
         if (!getThree) return;
         const { controls } = getThree();
-        (controls as unknown as CameraControls).enabled = false;
+        /** Force cancel camera drag action. */
+        (controls as unknown as CameraControls).cancel();
       },
-      unlockCameraControls: ({ getThree }) => {
-        if (!getThree) return;
-        const { controls } = getThree();
-        (controls as unknown as CameraControls).enabled = true;
-      },
+
       dropCard: ({ carryPile }) => {
         // const card = carryPile.drawCard();
         carryPile.dropCard();
@@ -500,6 +514,12 @@ export const GameMachine = createMachine(
       /** Carry Pile. */
       carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
       carryPileNotEmpty: ({ carryPile }) => !carryPile.isEmpty(),
+
+      /** Check if auto place is valid. */
+      canAutoPlace: ({ carryPile, foundationPiles }, { card }) =>
+        card.isFaceUp &&
+        Object.is(card, card.currentPile.peek()) &&
+        foundationPiles[card.suit].canPlace(card),
 
       /** Check if all cards have been uncovered. */
       allFaceUp: ({ tableauPiles }) => {
