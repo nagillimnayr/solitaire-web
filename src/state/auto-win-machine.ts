@@ -36,10 +36,9 @@ export const AutoWinMachine = createMachine(
     states: {
       autoPlacing: {
         after: {
-          /** Check for win. */
-          300: { cond: 'hasWon', target: 'finished' },
-
           50: [
+            /** Check for win. */
+            { cond: 'hasWon', target: 'finished' },
             /** Try to place a card from the tableaus first. */
             {
               cond: 'canPlaceFromTableau',
