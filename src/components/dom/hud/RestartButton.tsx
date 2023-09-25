@@ -16,7 +16,7 @@ export const RestartButton = () => {
   return (
     <ErrorBoundary fallback={<div>Something went wrong</div>}>
       <button
-        className='rounded-md border border-gray-500 bg-gray-300 p-2 transition-all hover:bg-gray-400'
+        className='pointer-events-auto rounded-md border border-gray-500 bg-gray-300 p-2 transition-all hover:bg-gray-400'
         onClick={handleClick}
       >
         Restart

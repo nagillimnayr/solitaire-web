@@ -3,6 +3,7 @@ import { RestartButton } from './RestartButton';
 import { cn } from '@/helpers/cn';
 import { DrawButton } from './DrawButton';
 import { ReturnButton } from './ReturnButton';
+import { WinScreen } from './win-screen/WinScreen';
 
 export const GameHud = () => {
   return (
@@ -20,6 +21,7 @@ export const GameHud = () => {
           <ReturnButton />
         </div>
       </div>
+      <WinScreen />
     </>
   );
 };
