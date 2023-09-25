@@ -103,7 +103,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
       (event: ThreeEvent<PointerEvent>) => {
         /**  */
         const card = localRef.current;
-        console.log('card:', card);
+        // console.log('card:', card);
         const currentPile = card.currentPile;
         if (currentPile instanceof TableauPileImpl) {
           event.stopPropagation();
@@ -133,7 +133,7 @@ const PlayingCard = forwardRef<PlayingCardImpl, PlayingCardProps>(
     const handleDoubleClick = useCallback(
       (event: ThreeEvent<MouseEvent>) => {
         /**  */
-        console.log('doubleClick');
+        // console.log('doubleClick');
         event.stopPropagation();
         const card = localRef.current;
         GameActor.send({ type: 'AUTO_PLACE_CARD', card });
