@@ -39,7 +39,7 @@ export const AutoWinMachine = createMachine(
           /** Check for win. */
           300: { cond: 'hasWon', target: 'finished' },
 
-          25: [
+          50: [
             /** Try to place a card from the tableaus first. */
             {
               cond: 'canPlaceFromTableau',
@@ -59,7 +59,7 @@ export const AutoWinMachine = createMachine(
       },
       drawingCard: {
         after: {
-          25: [
+          50: [
             /** If stock is empty, return cards from waste. */
             { cond: 'stockIsEmpty', target: 'returningWaste' },
             /** Draw card. */
@@ -92,7 +92,7 @@ export const AutoWinMachine = createMachine(
           const card = tableauPile.peek();
           const foundationPile = foundationPiles[card.suit];
           if (foundationPile.canPlace(card)) {
-            tableauPile.drawCard().addToPile(foundationPile);
+            tableauPile.drawCard().addToPile(foundationPile, true);
             return;
           }
         }
@@ -101,7 +101,11 @@ export const AutoWinMachine = createMachine(
         /** Place card from waste to foundation. */
         const card = wastePile.drawCard();
         const foundationPile = foundationPiles[card.suit];
-        card.addToPile(foundationPile);
+        card.addToPile(foundationPile, true);
+      },
+      drawCard: ({ stockPile, wastePile }) => {
+        const card = stockPile.drawCard();
+        return card.addToPile(wastePile, true);
       },
     },
     guards: {
