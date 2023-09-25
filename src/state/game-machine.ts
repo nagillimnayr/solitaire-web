@@ -318,7 +318,8 @@ export const GameMachine = createMachine(
         on: {
           /** NOTE: This is causing some bugs. */
           AUTO_PLACE_CARD: {
-            cond: (_, { card }) => card.isFaceUp,
+            cond: (_, { card }) =>
+              card.isFaceUp && Object.is(card, card.currentPile.peek()),
             actions: [
               // 'logEvent',
               'assignLastEvent',
