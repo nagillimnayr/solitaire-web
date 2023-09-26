@@ -68,13 +68,13 @@ export const AutoPlayMachine = createMachine(
           BASE_DELAY: [
             {
               cond: 'canMoveTableauToFoundation',
-              actions: ['autoMoveTableauToFoundation'],
+              actions: ['moveTableauToFoundation'],
               target: 'flippingTableau',
             },
             /** If no move can be made from the tableaus, try to place a card from the waste. */
             {
               cond: 'canMoveWasteToFoundation',
-              actions: ['autoMoveWasteToFoundation'],
+              actions: ['moveWasteToFoundation'],
               target: 'flippingTableau',
             },
             /** If no moves can be made, draw a card. */
@@ -153,6 +153,11 @@ export const AutoPlayMachine = createMachine(
         entry: [log('entry drawingCard')],
         after: {
           BASE_DELAY: [
+            {
+              cond: ({ wastePile, stockPile }) =>
+                wastePile.count === 1 && stockPile.isEmpty(),
+              target: 'idle',
+            },
             /** If stock is empty, return cards from waste. */
             { cond: 'stockIsEmpty', target: 'returningWaste' },
             /** Draw card. */
@@ -181,7 +186,7 @@ export const AutoPlayMachine = createMachine(
       flipTableau: ({ tableauPiles }) => {
         flipTableau(tableauPiles);
       },
-      autoMoveTableauToFoundation({ foundationPiles, tableauPiles }) {
+      moveTableauToFoundation({ foundationPiles, tableauPiles }) {
         /** Check each tableau until a valid move is found. */
         for (const tableauPile of tableauPiles) {
           if (tableauPile.isEmpty()) continue;
@@ -193,7 +198,7 @@ export const AutoPlayMachine = createMachine(
           }
         }
       },
-      autoMoveWasteToFoundation({ foundationPiles, wastePile }) {
+      moveWasteToFoundation({ foundationPiles, wastePile }) {
         /** Place card from waste to foundation. */
         const card = wastePile.drawCard();
         const foundationPile = foundationPiles[card.suit];
@@ -211,7 +216,7 @@ export const AutoPlayMachine = createMachine(
         let tableauPile = tableauPiles[kingIndex];
         let card: PlayingCardImpl = tableauPile.drawCard();
         card.addToPile(carryPile, true);
-        while (card.rank !== 13) {
+        while (card.rank !== 12) {
           card = tableauPile.drawCard();
           card.addToPile(carryPile, true);
         }
@@ -233,6 +238,9 @@ export const AutoPlayMachine = createMachine(
         for (const tableauPile of tableauPiles) {
           if (tableauPile.isEmpty()) continue;
           const pile = tableauPile.toArray();
+          /** Don't move if bottom card is a king and all cards are face up. */
+          if (tableauPile.isAllFaceUp() && pile[0].rank === 12) continue;
+
           for (const card of pile) {
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
@@ -293,7 +301,11 @@ export const AutoPlayMachine = createMachine(
       },
       canMoveTableauStack: ({ tableauPiles }) => {
         for (const tableauPile of tableauPiles) {
+          if (tableauPile.isEmpty()) continue;
           const pile = tableauPile.toArray();
+          /** Don't move if bottom card is a king and all cards are face up. */
+          if (tableauPile.isAllFaceUp() && pile[0].rank === 12) continue;
+
           for (const card of pile) {
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
