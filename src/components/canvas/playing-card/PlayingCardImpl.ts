@@ -160,4 +160,8 @@ export class PlayingCardImpl extends Mesh {
     });
     this._springRef.start({ rotation: PI });
   }
+
+  moveZ(newZ: number) {
+    this._springRef.start({ z: newZ });
+  }
 }
