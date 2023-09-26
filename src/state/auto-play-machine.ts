@@ -78,11 +78,12 @@ export const AutoPlayMachine = createMachine(
               target: 'flippingTableau',
             },
             /** If no moves can be made, draw a card. */
-            { target: 'movingKingToEmpty' },
+            { target: 'pickingUpKing' },
           ],
         },
       },
       pickingUpKing: {
+        entry: [log('entry pickingUpKing')],
         after: {
           BASE_DELAY: [
             {
@@ -90,12 +91,13 @@ export const AutoPlayMachine = createMachine(
               actions: ['pickupKing'],
               target: 'movingKingToEmpty',
             },
-            { target: 'movingTableauStack' },
+            { target: 'pickingUpTableauStack' },
           ],
         },
       },
 
       movingKingToEmpty: {
+        entry: [log('entry movingKingToEmpty')],
         after: {
           BASE_DELAY: [
             {
@@ -109,19 +111,33 @@ export const AutoPlayMachine = createMachine(
           ],
         },
       },
-      movingTableauStack: {
+      pickingUpTableauStack: {
+        entry: [log('entry pickingUpTableauStack')],
         after: {
           BASE_DELAY: [
             {
               cond: 'canMoveTableauStack',
-              actions: ['moveTableauStack'],
-              target: 'flippingTableau',
+              actions: ['pickupTableauStack'],
+              target: 'movingTableauStack',
             },
             { target: 'movingFromWaste' },
           ],
         },
       },
+      movingTableauStack: {
+        entry: [log('entry movingTableauStack')],
+        after: {
+          BASE_DELAY: [
+            { cond: 'carryPileIsEmpty', target: 'flippingTableau' },
+            {
+              actions: ['moveTableauStack'],
+              target: 'movingTableauStack',
+            },
+          ],
+        },
+      },
       movingFromWaste: {
+        entry: [log('entry movingFromWaste')],
         after: {
           BASE_DELAY: [
             {
@@ -134,8 +150,9 @@ export const AutoPlayMachine = createMachine(
         },
       },
       drawingCard: {
+        entry: [log('entry drawingCard')],
         after: {
-          50: [
+          BASE_DELAY: [
             /** If stock is empty, return cards from waste. */
             { cond: 'stockIsEmpty', target: 'returningWaste' },
             /** Draw card. */
@@ -193,10 +210,10 @@ export const AutoPlayMachine = createMachine(
         /** Get king. */
         let tableauPile = tableauPiles[kingIndex];
         let card: PlayingCardImpl = tableauPile.drawCard();
-        card.addToPile(carryPile);
+        card.addToPile(carryPile, true);
         while (card.rank !== 13) {
           card = tableauPile.drawCard();
-          card.addToPile(carryPile);
+          card.addToPile(carryPile, true);
         }
       },
       moveKingToEmpty({ tableauPiles, carryPile }) {
@@ -210,9 +227,34 @@ export const AutoPlayMachine = createMachine(
         /** Get king. */
         let tableauPile = tableauPiles[emptyIndex];
         const card = carryPile.drawCard();
-        card.addToPile(tableauPile);
+        card.addToPile(tableauPile, true);
       },
-      moveTableauStack({ tableauPiles }) {},
+      pickupTableauStack({ tableauPiles, carryPile }) {
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.isEmpty()) continue;
+          const pile = tableauPile.toArray();
+          for (const card of pile) {
+            for (const otherPile of tableauPiles) {
+              if (Object.is(otherPile, tableauPile)) continue;
+              if (otherPile.canPlace(card)) {
+                while (!Object.is(tableauPile.peek(), card)) {
+                  tableauPile.drawCard().addToPile(carryPile, true);
+                }
+                tableauPile.drawCard().addToPile(carryPile, true);
+                return;
+              }
+            }
+          }
+        }
+      },
+      moveTableauStack({ tableauPiles, carryPile }) {
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.canPlace(carryPile.peek())) {
+            carryPile.drawCard().addToPile(tableauPile, true);
+            return;
+          }
+        }
+      },
       moveWasteToTableau({ wastePile, tableauPiles }) {},
       drawCard({ stockPile, wastePile }) {
         const card = stockPile.drawCard();
@@ -242,6 +284,15 @@ export const AutoPlayMachine = createMachine(
         return emptyIndex !== -1 && kingIndex !== -1;
       },
       canMoveTableauStack: ({ tableauPiles }) => {
+        for (const tableauPile of tableauPiles) {
+          const pile = tableauPile.toArray();
+          for (const card of pile) {
+            for (const otherPile of tableauPiles) {
+              if (Object.is(otherPile, tableauPile)) continue;
+              if (otherPile.canPlace(card)) return true;
+            }
+          }
+        }
         return false;
       },
       canMoveWasteToTableau: ({ wastePile, tableauPiles }) => {
@@ -261,7 +312,7 @@ export const AutoPlayMachine = createMachine(
       carryPileIsEmpty: ({ carryPile }) => carryPile.isEmpty(),
     },
     delays: {
-      BASE_DELAY: 10,
+      BASE_DELAY: 50,
     },
   },
 );
