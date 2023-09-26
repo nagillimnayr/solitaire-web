@@ -23,7 +23,7 @@ export class FoundationPileImpl extends Pile {
     this.getWorldPosition(_pos);
     this._pile.push(card);
     _pos.z += Z_OFFSET * this.count;
-    this.adjustZOffsets();
+    setTimeout(() => this.adjustZOffsets(), 100);
     return card.moveTo(_pos);
   }
 
@@ -53,8 +53,9 @@ export class FoundationPileImpl extends Pile {
 
   adjustZOffsets() {
     const pile = this._pile.toArray();
+    this.getWorldPosition(_pos);
     for (let i = 0; i < pile.length; ++i) {
-      const z = this.position.z + Z_OFFSET * (i + 1);
+      const z = _pos.z + Z_OFFSET * (i + 1);
       pile[i].moveZ(z);
     }
   }
