@@ -103,19 +103,19 @@ export const GameMachine = createMachine(
       },
       ASSIGN_STOCK: {
         actions: [
-          'logEvent',
+          // 'logEvent',
           assign({ stockPile: (_, event) => event.stockPile }),
         ],
       },
       ASSIGN_WASTE: {
         actions: [
-          'logEvent',
+          // 'logEvent',
           assign({ wastePile: (_, event) => event.wastePile }),
         ],
       },
       ASSIGN_TABLEAU: {
         actions: [
-          'logEvent',
+          // 'logEvent',
           ({ tableauPiles }, { tableauPile }) => {
             tableauPiles[tableauPile.index] = tableauPile;
           },
@@ -123,7 +123,7 @@ export const GameMachine = createMachine(
       },
       ASSIGN_FOUNDATION: {
         actions: [
-          'logEvent',
+          // 'logEvent',
           ({ foundationPiles }, { foundationPile }) => {
             foundationPiles[foundationPile.suit] = foundationPile;
           },
