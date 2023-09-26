@@ -255,7 +255,15 @@ export const AutoPlayMachine = createMachine(
           }
         }
       },
-      moveWasteToTableau({ wastePile, tableauPiles }) {},
+      moveWasteToTableau({ wastePile, tableauPiles }) {
+        const card = wastePile.peek();
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.canPlace(card)) {
+            wastePile.drawCard().addToPile(tableauPile);
+            return;
+          }
+        }
+      },
       drawCard({ stockPile, wastePile }) {
         const card = stockPile.drawCard();
         card.addToPile(wastePile, true);
@@ -296,6 +304,11 @@ export const AutoPlayMachine = createMachine(
         return false;
       },
       canMoveWasteToTableau: ({ wastePile, tableauPiles }) => {
+        if (wastePile.isEmpty()) return false;
+        const card = wastePile.peek();
+        for (const tableauPile of tableauPiles) {
+          if (tableauPile.canPlace(card)) return true;
+        }
         return false;
       },
 
