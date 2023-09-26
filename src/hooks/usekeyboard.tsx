@@ -25,6 +25,14 @@ export function useKeyboard() {
         GameActor.send({ type: 'END_AUTO_PLAY' });
         break;
       }
+      case 'KeyL': {
+        const { tableauPiles } = GameActor.getSnapshot()!.context;
+        for (const tableauPile of tableauPiles) {
+          const pile = tableauPile.toArray();
+          console.log(`tableauPiles[${tableauPile.index}].toArray():`, pile);
+        }
+        break;
+      }
     }
   });
 }
