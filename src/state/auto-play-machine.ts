@@ -47,7 +47,7 @@ export const AutoPlayMachine = createMachine(
     },
 
     on: {
-      END_AUTO_PLAY: { target: 'finished' },
+      END_AUTO_PLAY: { cond: 'carryPileIsEmpty', target: 'finished' },
     },
 
     initial: 'idle',
