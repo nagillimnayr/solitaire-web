@@ -23,7 +23,7 @@ export class FoundationPileImpl extends Pile {
     this.getWorldPosition(_pos);
     this._pile.push(card);
     _pos.z += Z_OFFSET * this.count;
-
+    this.adjustZOffsets();
     return card.moveTo(_pos);
   }
 
@@ -45,5 +45,17 @@ export class FoundationPileImpl extends Pile {
   /** Check if foundation is full. */
   isFull() {
     return this.count === NUMBER_OF_RANKS;
+  }
+
+  toArray() {
+    return this._pile.toArray();
+  }
+
+  adjustZOffsets() {
+    const pile = this._pile.toArray();
+    for (let i = 0; i < pile.length; ++i) {
+      const z = this.position.z + Z_OFFSET * (i + 1);
+      pile[i].moveZ(z);
+    }
   }
 }
