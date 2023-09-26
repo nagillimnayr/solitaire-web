@@ -31,12 +31,6 @@ const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
 const _pos2 = new Vector3();
 
-/** Helper for shuffling the deck. */
-type SplitPiles = {
-  pile1: PlayingCardImpl[];
-  pile2: PlayingCardImpl[];
-};
-
 type GameEvents =
   /** Assignment events. */
   | { type: 'ASSIGN_GET_THREE'; getThree: () => RootState }
@@ -57,7 +51,9 @@ type GameEvents =
   | { type: 'PLACE_CARD_TABLEAU'; tableauPile: TableauPileImpl }
   | { type: 'PLACE_CARD_FOUNDATION'; foundationPile: FoundationPileImpl }
   | { type: 'CLICK_CARD'; card: PlayingCardImpl }
-  | { type: 'DOUBLE_CLICK_CARD'; card: PlayingCardImpl };
+  | { type: 'DOUBLE_CLICK_CARD'; card: PlayingCardImpl }
+  | { type: 'START_AUTO_PLAY' }
+  | { type: 'END_AUTO_PLAY' };
 
 type GameContext = {
   getThree: () => RootState;
@@ -66,8 +62,6 @@ type GameContext = {
   foundationPiles: FoundationPileImpl[];
   tableauPiles: TableauPileImpl[];
   carryPile: CarryPileImpl;
-
-  splitPiles: SplitPiles; // Helper for shuffling the deck.
 
   lastEvent: GameEvents;
 };
@@ -90,11 +84,6 @@ export const GameMachine = createMachine(
       tableauPiles: new Array<TableauPileImpl>(7),
 
       carryPile: null!,
-
-      splitPiles: {
-        pile1: new Array<PlayingCardImpl>(),
-        pile2: new Array<PlayingCardImpl>(),
-      },
 
       lastEvent: null!,
     },
