@@ -122,7 +122,7 @@ export const AutoWinMachine = createMachine(
         if (wastePile.isEmpty()) return false;
         const card = wastePile.peek();
         const foundationPile = foundationPiles[card.suit];
-        if (foundationPile.canPlace(card)) return true;
+        return foundationPile.canPlace(card);
       },
       stockIsEmpty: ({ stockPile }) => stockPile.isEmpty(),
       wasteIsEmpty: ({ wastePile }) => wastePile.isEmpty(),
