@@ -33,6 +33,14 @@ export function useKeyboard() {
         }
         break;
       }
+      case 'KeyF': {
+        const { foundationPiles } = GameActor.getSnapshot()!.context;
+        for (const foundationPile of foundationPiles) {
+          const pile = foundationPile.toArray().map((card) => card.name);
+          console.log(`tableauPiles[${foundationPile.suit}].toArray():`, pile);
+        }
+        break;
+      }
     }
   });
 }
