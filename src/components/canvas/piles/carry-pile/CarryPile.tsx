@@ -38,7 +38,8 @@ export const CarryPile = ({}: CarryPileProps) => {
     const carryPile = ref.current;
 
     /** To avoid weird issues with the cards still following the mouse while being dropped, don't follow the mouse if in the dropping state. */
-    if (GameActor.getSnapshot()!.matches('droppingCards')) return;
+    const state = GameActor.getSnapshot()!;
+    if (state.matches('droppingCards') || state.matches('autoPlaying')) return;
 
     raycaster.setFromCamera(pointer, camera);
     if (raycaster.ray.intersectPlane(plane, _pos)) {
