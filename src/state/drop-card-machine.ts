@@ -35,7 +35,7 @@ export const DropCardMachine = createMachine(
             // cond: 'carryPileNotEmpty',
             actions: ['dropCard'],
             target: 'droppingCards',
-            delay: 25,
+            delay: 10,
           },
         ],
       },
