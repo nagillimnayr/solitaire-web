@@ -417,6 +417,7 @@ export const GameMachine = createMachine(
         },
         on: {
           END_AUTO_PLAY: {
+            cond: 'carryPileIsEmpty',
             actions: ['logEvent'],
             target: 'checkingForWin',
           },
