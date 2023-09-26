@@ -77,11 +77,21 @@ export class TableauPileImpl extends Pile {
   hasFaceUpKing() {
     if (this.isAllFaceUp()) return false;
     const pile = this._pile.toArray();
-    console.log(pile);
+    // console.log(pile);
     for (let i = 1; i < this.count; ++i) {
       const card = pile[i];
       if (card.rank === 13 && card.isFaceUp) return true;
     }
     return false;
+  }
+
+  /** Returns an array containing all of the face up cards in the pile. */
+  toArray() {
+    const pile = this._pile.toArray();
+    const arr: Array<PlayingCardImpl> = [];
+    for (const card of pile) {
+      card.isFaceUp && arr.push(card);
+    }
+    return arr;
   }
 }
