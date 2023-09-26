@@ -267,7 +267,7 @@ export const AutoPlayMachine = createMachine(
 
           for (const card of pile) {
             /** Don't move this card if it was the last card moved. */
-            if (Object.is(card, lastCardMoved.ref)) continue;
+            // if (Object.is(card, lastCardMoved.ref)) continue;
 
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
@@ -336,7 +336,7 @@ export const AutoPlayMachine = createMachine(
 
           for (const card of pile) {
             /** Don't move this card if it was the last card moved. */
-            if (Object.is(card, lastCardMoved.ref)) continue;
+            // if (Object.is(card, lastCardMoved.ref)) continue;
 
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
