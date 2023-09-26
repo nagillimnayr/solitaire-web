@@ -98,7 +98,7 @@ export const AutoPlayMachine = createMachine(
         },
       },
       pickingUpKing: {
-        // entry: [log('entry pickingUpKing')],
+        entry: [log('entry pickingUpKing')],
         after: {
           BASE_DELAY: [
             {
@@ -121,7 +121,7 @@ export const AutoPlayMachine = createMachine(
       },
 
       movingKingToEmpty: {
-        // entry: [log('entry movingKingToEmpty')],
+        entry: [log('entry movingKingToEmpty')],
         after: {
           BASE_DELAY: [
             {
@@ -136,7 +136,7 @@ export const AutoPlayMachine = createMachine(
         },
       },
       pickingUpTableauStack: {
-        // entry: [log('entry pickingUpTableauStack')],
+        entry: [log('entry pickingUpTableauStack')],
         after: {
           BASE_DELAY: [
             {
@@ -149,7 +149,7 @@ export const AutoPlayMachine = createMachine(
         },
       },
       movingTableauStack: {
-        // entry: [log('entry movingTableauStack')],
+        entry: [log('entry movingTableauStack')],
         after: {
           BASE_DELAY: [
             { cond: 'carryPileIsEmpty', target: 'flippingTableau' },
@@ -161,7 +161,7 @@ export const AutoPlayMachine = createMachine(
         },
       },
       movingFromWaste: {
-        // entry: [log('entry movingFromWaste')],
+        entry: [log('entry movingFromWaste')],
         after: {
           BASE_DELAY: [
             {
@@ -174,7 +174,7 @@ export const AutoPlayMachine = createMachine(
         },
       },
       drawingCard: {
-        // entry: [log('entry drawingCard')],
+        entry: [log('entry drawingCard')],
         after: {
           BASE_DELAY: [
             {
@@ -210,7 +210,11 @@ export const AutoPlayMachine = createMachine(
       flipTableau: ({ tableauPiles }) => {
         flipTableau(tableauPiles);
       },
-      moveTableauToFoundation({ foundationPiles, tableauPiles }) {
+      moveTableauToFoundation({
+        foundationPiles,
+        tableauPiles,
+        lastCardMoved,
+      }) {
         /** Check each tableau until a valid move is found. */
         for (const tableauPile of tableauPiles) {
           if (tableauPile.isEmpty()) continue;
@@ -218,17 +222,20 @@ export const AutoPlayMachine = createMachine(
           const foundationPile = foundationPiles[card.suit];
           if (foundationPile.canPlace(card)) {
             tableauPile.drawCard().addToPile(foundationPile, true);
+
+            lastCardMoved.ref = card;
             return;
           }
         }
       },
-      moveWasteToFoundation({ foundationPiles, wastePile }) {
+      moveWasteToFoundation({ foundationPiles, wastePile, lastCardMoved }) {
         /** Place card from waste to foundation. */
         const card = wastePile.drawCard();
         const foundationPile = foundationPiles[card.suit];
         card.addToPile(foundationPile, true);
+        lastCardMoved.ref = card;
       },
-      pickupKing({ tableauPiles, carryPile }) {
+      pickupKing({ tableauPiles, carryPile, lastCardMoved }) {
         let kingIndex = findTableauWithFaceUpKing(tableauPiles);
 
         if (kingIndex === -1) {
@@ -244,6 +251,8 @@ export const AutoPlayMachine = createMachine(
           card = tableauPile.drawCard();
           card.addToPile(carryPile, true);
         }
+
+        lastCardMoved.ref = card;
       },
       moveKingToEmpty({ tableauPiles, carryPile }) {
         let emptyIndex = findEmptyTableau(tableauPiles);
@@ -267,7 +276,7 @@ export const AutoPlayMachine = createMachine(
 
           for (const card of pile) {
             /** Don't move this card if it was the last card moved. */
-            // if (Object.is(card, lastCardMoved.ref)) continue;
+            if (Object.is(card, lastCardMoved.ref)) continue;
 
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
@@ -331,13 +340,14 @@ export const AutoPlayMachine = createMachine(
         for (const tableauPile of tableauPiles) {
           if (tableauPile.isEmpty()) continue;
           const pile = tableauPile.toArray();
-          /** Don't move if bottom card is a king and all cards are face up. */
-          if (tableauPile.isAllFaceUp() && pile[0].rank === 12) continue;
 
           for (const card of pile) {
-            /** Don't move this card if it was the last card moved. */
-            // if (Object.is(card, lastCardMoved.ref)) continue;
+            /** Don't move if bottom card is a king and all cards are face up. */
+            if (tableauPile.isAllFaceUp() && card.rank === 12) continue;
 
+            /** Don't move this card if it was the last card moved. */
+            if (Object.is(card, lastCardMoved.ref)) continue;
+            console.log('card:', card.name);
             for (const otherPile of tableauPiles) {
               if (Object.is(otherPile, tableauPile)) continue;
               if (otherPile.canPlace(card)) return true;
