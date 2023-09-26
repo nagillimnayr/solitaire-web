@@ -75,6 +75,7 @@ export class TableauPileImpl extends Pile {
   }
 
   hasFaceUpKing() {
+    if (this.isAllFaceUp()) return false;
     const pile = this._pile.toArray();
     console.log(pile);
     for (let i = 1; i < this.count; ++i) {

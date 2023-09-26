@@ -33,3 +33,25 @@ export function areAllFoundationsFull(foundationPiles: FoundationPileImpl[]) {
   }
   return true;
 }
+
+/** Checks tableaus from left to right and returns the index of the first one found that has a face-up king that isn't the bottom card. Returns -1 if none were found. */
+export function findTableauWithFaceUpKing(tableauPiles: TableauPileImpl[]) {
+  for (const tableauPile of tableauPiles) {
+    if (tableauPile.hasFaceUpKing()) {
+      return tableauPile.index;
+    }
+  }
+
+  return -1;
+}
+
+/** Checks tableaus from left to right and returns the index of the first empty one found. Returns -1 if none were found. */
+export function findEmptyTableau(tableauPiles: TableauPileImpl[]) {
+  for (const tableauPile of tableauPiles) {
+    if (tableauPile.isEmpty()) {
+      return tableauPile.index;
+    }
+  }
+
+  return -1;
+}

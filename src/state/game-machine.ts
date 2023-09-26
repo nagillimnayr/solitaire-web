@@ -2,7 +2,15 @@ import { StockPileImpl } from '@/components/canvas/piles/stock-pile/StockPileImp
 import { WastePileImpl } from '@/components/canvas/piles/waste-pile/WastePileImpl';
 import { TableauPileImpl } from '@/components/canvas/piles/tableau-pile/TableauPileImpl';
 import { FoundationPileImpl } from '@/components/canvas/piles/foundation-pile/FoundationPileImpl';
-import { ContextFrom, assign, choose, createMachine, log, raise } from 'xstate';
+import {
+  ContextFrom,
+  assign,
+  choose,
+  createMachine,
+  log,
+  raise,
+  sendTo,
+} from 'xstate';
 import { create } from 'zustand';
 import xstate from 'zustand-middleware-xstate';
 import { PlayingCardImpl } from '@/components/canvas/playing-card/PlayingCardImpl';
@@ -26,6 +34,7 @@ import { flipTableau } from '../helpers/playing-card-utils';
 import { ReturnWasteMachine } from './return-waste-machine';
 import { AutoWinMachine } from './auto-win-machine';
 import { DropCardMachine } from './drop-card-machine';
+import { AutoPlayMachine } from './auto-play-machine';
 
 const HALF_DECK_SIZE = NUMBER_OF_CARDS / 2;
 const _pos1 = new Vector3();
@@ -193,6 +202,7 @@ export const GameMachine = createMachine(
               target: 'drawing',
             },
           ],
+          START_AUTO_PLAY: { target: 'autoPlaying', actions: ['logEvent'] },
         },
       },
       restarting: {
@@ -390,6 +400,26 @@ export const GameMachine = createMachine(
         on: {
           RESTART: {
             target: 'restarting',
+          },
+        },
+      },
+      autoPlaying: {
+        invoke: {
+          id: 'auto-play-actor',
+          src: AutoPlayMachine,
+          data: {
+            stockPile: ({ stockPile }) => stockPile,
+            wastePile: ({ wastePile }) => wastePile,
+            tableauPiles: ({ tableauPiles }) => tableauPiles,
+            foundationPiles: ({ foundationPiles }) => foundationPiles,
+            carryPile: ({ carryPile }) => carryPile,
+          },
+          onDone: { target: 'checkingForWin' },
+        },
+        on: {
+          END_AUTO_PLAY: {
+            actions: ['logEvent'],
+            target: 'checkingForWin',
           },
         },
       },
