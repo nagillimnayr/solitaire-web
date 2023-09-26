@@ -180,8 +180,7 @@ export const GameMachine = createMachine(
           ],
           PICKUP_CARD: {
             /** Only valid if card is face up. */
-            cond: ({ carryPile }, { card }) =>
-              card.isFaceUp && !Object.is(card.currentPile, carryPile),
+            cond: 'canPickUpCard',
             actions: [
               'logEvent',
               'pickupCard',
@@ -514,6 +513,17 @@ export const GameMachine = createMachine(
       },
     },
     guards: {
+      canPickUpCard: ({ carryPile }, { card }) => {
+        if (!card.isFaceUp) return false;
+        if (Object.is(card.currentPile, carryPile)) return false;
+
+        if (!(card.currentPile instanceof TableauPileImpl)) {
+          return Object.is(card, card.currentPile.peek());
+        }
+
+        return true;
+      },
+
       /** Stock. */
       // stockIsFull: ({ stockPile }) => stockPile.isFull(),
       // stockNotFull: ({ stockPile }) => !stockPile.isFull(),
