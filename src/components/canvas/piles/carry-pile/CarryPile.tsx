@@ -52,7 +52,12 @@ export const CarryPile = ({}: CarryPileProps) => {
       <MeshDiscardMaterial />
       {/* <axesHelper rotation-y={PI} /> */}
       {/* <arrowHelper args={[Z_AXIS_NEG]} /> */}
-      <Ring args={[0.9, 1]} scale={0.01} />
+      <Ring
+        args={[0.9, 1]}
+        scale={0.01}
+        position-z={1e-3}
+        material-color={'white'}
+      />
     </carryPileImpl>
   );
 };
