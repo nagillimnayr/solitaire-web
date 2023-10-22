@@ -76,7 +76,7 @@ export class PlayingCardImpl extends Mesh {
 
   update(deltaTime) {
     if (this.position.distanceTo(this._targetPos) < DISTANCE_THRESHOLD) {
-      this.dispatchEvent({ type: 'REST' });
+      // this.dispatchEvent({ type: 'REST' });
     }
   }
 
@@ -94,7 +94,7 @@ export class PlayingCardImpl extends Mesh {
 
   moveTo(newPos: Vector3) {
     // console.log('moveTo:', newPos.toArray());
-    this.dispatchEvent({ type: 'START_MOVE' });
+    // this.dispatchEvent({ type: 'START_MOVE' });
     // this.position.z += newPos.z;
     this._targetPos.copy(newPos);
     this._isMoving = true;
@@ -102,17 +102,19 @@ export class PlayingCardImpl extends Mesh {
     /** Need to set 'from' as the current position so that it will work properly even when attaching to a different object. */
     const [x0, y0, z0] = this.position.toArray();
     const [x, y, z] = newPos.toArray();
-    this._springRef.start({ from: { x: x0, y: y0, z: z0 }, to: { x, y, z } });
+
+    // this._springRef.start({ from: { x: x0, y: y0, z: z0 }, to: { x, y, z } });
 
     // Create promise that will be resolved when the 'rest' event is triggered.
     return new Promise<never>((resolve) => {
-      const onResolve = () => {
-        this.removeEventListener('REST', onResolve);
-        this._isMoving = false;
-        resolve(null);
-      };
-
-      this.addEventListener('REST', onResolve);
+      this._springRef.start({
+        from: { x: x0, y: y0, z: z0 },
+        to: { x, y, z },
+        onRest: () => {
+          this._isMoving = false;
+          resolve(null);
+        },
+      });
     });
   }
 
