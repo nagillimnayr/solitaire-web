@@ -1,10 +1,12 @@
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { Background } from '../scene/Background';
 import { PlayingCard } from '../playing-card/PlayingCard';
 import {
   CARD_HEIGHT_WITH_MARGIN,
   CARD_WIDTH_HALF,
   CARD_WIDTH_HALF_WITH_MARGIN,
+  PI_OVER_3,
+  PI_OVER_6,
   RANKS,
   SUITS,
 } from '@/helpers/constants';
@@ -60,6 +62,15 @@ export const SolitaireGame = () => {
     GameActor.send({ type: 'DROP_CARD' });
   });
 
+  const camControlsRef = useRef<CameraControls>(null!);
+
+  useEffect(() => {
+    const controls = camControlsRef.current;
+    if (!controls) return;
+    controls.moveTo(0, 0, 0, false);
+    controls.mouseButtons.right = 0;
+  }, []);
+
   return (
     <group name='solitaire-game'>
       {/* <axesHelper /> */}
@@ -69,8 +80,17 @@ export const SolitaireGame = () => {
       <Tableaus position={TABLEAUS_POS} />
       <CarryPile />
       {cards}
-      <PerspectiveCamera makeDefault position-z={0.5} near={1e-3} />
-      <CameraControls makeDefault />
+      <PerspectiveCamera makeDefault position-z={0.6} near={1e-3} />
+      <CameraControls
+        ref={camControlsRef}
+        makeDefault
+        minDistance={0.4}
+        maxDistance={0.8}
+        minAzimuthAngle={-PI_OVER_3}
+        maxAzimuthAngle={PI_OVER_3}
+        minPolarAngle={PI_OVER_6}
+        maxPolarAngle={5 * PI_OVER_6}
+      />
       <ambientLight intensity={0.7} />
     </group>
   );
