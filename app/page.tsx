@@ -21,8 +21,8 @@ const Common = dynamic(
 export default function Page() {
   return (
     <>
-      <div className='mx-auto flex h-screen w-full flex-col flex-wrap items-center p-4 '>
-        <div className='relative m-0 h-full w-full p-0 '>
+      <div className='mx-auto flex h-screen w-full flex-col flex-wrap items-center '>
+        <div className='relative m-0 h-full w-full p-0'>
           <GameHud />
           <View orbit={false} className='relative h-full w-full'>
             <Suspense fallback={null}>
