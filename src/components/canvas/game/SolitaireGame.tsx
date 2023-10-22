@@ -68,7 +68,6 @@ export const SolitaireGame = () => {
     const controls = camControlsRef.current;
     if (!controls) return;
     controls.moveTo(0, 0, 0, false);
-    controls.mouseButtons.right = 0;
   }, []);
 
   return (
@@ -90,6 +89,7 @@ export const SolitaireGame = () => {
         maxAzimuthAngle={PI_OVER_3}
         minPolarAngle={PI_OVER_6}
         maxPolarAngle={5 * PI_OVER_6}
+        mouseButtons-right={0}
       />
       <ambientLight intensity={0.7} />
     </group>
