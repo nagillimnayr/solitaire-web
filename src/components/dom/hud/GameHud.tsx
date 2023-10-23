@@ -15,10 +15,10 @@ export const GameHud = () => {
           'grid-rows-[minmax(64px,_128px)_1fr_minmax(64px,_128px)]',
         )}
       >
-        <div className='pointer-events-auto col-start-2 h-fit w-fit'>
+        <div className='pointer-events-auto col-start-2 flex h-fit w-fit gap-4'>
           <RestartButton />
           <DrawButton />
-          <ReturnButton />
+          {/* <ReturnButton /> */}
         </div>
       </div>
       <WinScreen />
