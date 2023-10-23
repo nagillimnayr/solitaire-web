@@ -1,11 +1,12 @@
 import { PositionProps } from '@/helpers/props';
 import { CarryPileImpl } from './CarryPileImpl';
-import { useContext, useEffect, useMemo, useRef } from 'react';
-import { Object3DNode, extend, useFrame } from '@react-three/fiber';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { Object3DNode, extend, useFrame, useThree } from '@react-three/fiber';
 import { GlobalStateContext } from '@/components/dom/providers/GlobalStateProvider';
 import { Plane, Vector3 } from 'three';
 import { MeshDiscardMaterial, Ring } from '@react-three/drei';
 import { PI, Z_AXIS_NEG } from '@/helpers/constants';
+import { useEventListener } from 'usehooks-ts';
 
 const _pos = new Vector3();
 
@@ -22,6 +23,7 @@ type CarryPileProps = PositionProps & {
 export const CarryPile = ({}: CarryPileProps) => {
   const { GameActor } = useContext(GlobalStateContext);
   const ref = useRef<CarryPileImpl>(null!);
+  const getThree = useThree(({ get }) => get);
 
   /** Assign stock pile in global context. */
   useEffect(() => {
@@ -34,7 +36,8 @@ export const CarryPile = ({}: CarryPileProps) => {
     return new Plane(new Vector3(0, 0, -1), 0.1);
   }, []);
 
-  useFrame(({ pointer, raycaster, camera }, delta) => {
+  const updatePosition = useCallback(() => {
+    const { pointer, raycaster, camera } = getThree();
     const carryPile = ref.current;
 
     /** To avoid weird issues with the cards still following the mouse while being dropped, don't follow the mouse if in the dropping state. */
@@ -45,7 +48,9 @@ export const CarryPile = ({}: CarryPileProps) => {
     if (raycaster.ray.intersectPlane(plane, _pos)) {
       carryPile.position.copy(_pos);
     }
-  });
+  }, [GameActor, getThree, plane]);
+
+  useEventListener('mousemove', updatePosition);
 
   return (
     <carryPileImpl ref={ref}>
