@@ -1,8 +1,8 @@
-const title = 'React Three Next Starter'
-const url = 'https://react-three-next.vercel.app/'
-const description = 'The easiest and fastest way to create a 3D website using React Three Fiber and NextJS'
-const author = 'Author'
-const twitter = '@pmndrs'
+const title = 'Solitaire!';
+const url = 'https://react-three-next.vercel.app/';
+const description = 'Its Solitaire!';
+const author = 'Ryan Milligan';
+const twitter = '@pmndrs';
 
 export default function Head() {
   return (
@@ -18,10 +18,7 @@ export default function Head() {
       {/* Search Engine Optimization Meta Tags */}
       <title>{title}</title>
       <meta name='description' content={description} />
-      <meta
-        name='keywords'
-        content='Software Engineer,Product Manager,Project Manager,Data Scientist,Computer Scientist'
-      />
+      <meta name='keywords' content='Solitaire' />
       <meta name='robots' content='index,follow' />
       <meta name='distribution' content='web' />
       {/* 
@@ -35,17 +32,36 @@ export default function Head() {
       <meta property='og:description' content={description} />
 
       <link rel='apple-touch-icon' href='/icons/apple-touch-icon.png' />
-      <link rel='apple-touch-icon' sizes='16x16' href='/icons/favicon-16x16.png' />
-      <link rel='apple-touch-icon' sizes='32x32' href='/icons/favicon-32x32.png' />
-      <link rel='apple-touch-icon' sizes='180x180' href='/icons/apple-touch-icon.png' />
+      <link
+        rel='apple-touch-icon'
+        sizes='16x16'
+        href='/icons/favicon-16x16.png'
+      />
+      <link
+        rel='apple-touch-icon'
+        sizes='32x32'
+        href='/icons/favicon-32x32.png'
+      />
+      <link
+        rel='apple-touch-icon'
+        sizes='180x180'
+        href='/icons/apple-touch-icon.png'
+      />
       <link rel='manifest' href='/manifest.json' />
-      <link rel='mask-icon' color='#000000' href='/icons/safari-pinned-tab.svg' />
+      <link
+        rel='mask-icon'
+        color='#000000'
+        href='/icons/safari-pinned-tab.svg'
+      />
       <link rel='apple-touch-startup-image' href='/startup.png' />
 
       {/* Meta Tags for HTML pages on Mobile */}
       {/* <meta name="format-detection" content="telephone=yes"/>
         <meta name="HandheldFriendly" content="true"/>  */}
-      <meta name='viewport' content='width=device-width, minimum-scale=1, initial-scale=1.0' />
+      <meta
+        name='viewport'
+        content='width=device-width, minimum-scale=1, initial-scale=1.0'
+      />
       <meta name='theme-color' content='#000' />
       <link rel='shortcut icon' href='/icons/apple-touch-icon.png' />
 
@@ -56,5 +72,5 @@ export default function Head() {
       <meta name='twitter:card' content='summary' />
       <meta name='twitter:site' content={twitter} />
     </>
-  )
+  );
 }
