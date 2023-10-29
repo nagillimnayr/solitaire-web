@@ -9,7 +9,6 @@ import {
   useRef,
 } from 'react';
 import {
-  OrbitControls,
   PerspectiveCamera,
   View as ViewImpl,
   CameraControls,
@@ -37,7 +36,7 @@ type ViewProps = PropsWithChildren &
   };
 const View = forwardRef<HTMLDivElement, ViewProps>(
   ({ children, orbit, ...props }, ref) => {
-    const localRef = useRef(null);
+    const localRef = useRef(null!);
     useImperativeHandle(ref, () => localRef.current);
 
     return (
