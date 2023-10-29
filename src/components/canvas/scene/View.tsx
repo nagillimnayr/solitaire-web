@@ -32,7 +32,7 @@ export const Common = ({ color }: CommonProps) => (
 
 type ViewProps = PropsWithChildren &
   HTMLProps<HTMLDivElement> & {
-    orbit: boolean;
+    orbit?: boolean;
   };
 const View = forwardRef<HTMLDivElement, ViewProps>(
   ({ children, orbit, ...props }, ref) => {
