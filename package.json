@@ -16,6 +16,7 @@
     "@react-spring/web": "^9.7.3",
     "@react-three/drei": "^9.80.2",
     "@react-three/fiber": "^8.13.6",
+    "@vercel/analytics": "^1.1.1",
     "@xstate/cli": "^0.5.2",
     "@xstate/react": "^3.2.2",
     "clsx": "^2.0.0",
