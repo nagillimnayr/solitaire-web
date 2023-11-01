@@ -1,7 +1,9 @@
 import { MaterialNode, extend, useFrame } from '@react-three/fiber';
 import { shaderMaterial, useTexture } from '@react-three/drei';
-import vertex from './playing-card-shader.vert';
-import fragment from './playing-card-shader.frag';
+import {
+  playingCardVertexShader,
+  playingCardFragmentShader,
+} from './playing-card-shader';
 import { Texture, ShaderMaterial, DoubleSide } from 'three';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 
@@ -10,8 +12,8 @@ const PlayingCardShader = shaderMaterial(
     frontTexture: new Texture(),
     backTexture: new Texture(),
   },
-  vertex,
-  fragment,
+  playingCardVertexShader,
+  playingCardFragmentShader,
 );
 
 type PlayingCardShaderType = ShaderMaterial &
