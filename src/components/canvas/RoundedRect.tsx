@@ -29,13 +29,17 @@ export const RoundedRect = ({
   children,
   ...eventHandlers
 }: RoundedRectProps) => {
-  const geometry = useMemo(() => {
-    return new RoundedPlaneGeometry(width, height, radius, segments);
+  // const geometry = useMemo(() => {
+  //   return new RoundedPlaneGeometry(width, height, radius, segments);
+  // }, [height, radius, segments, width]);
+  const args: [number, number, number, number] = useMemo(() => {
+    return [width, height, radius, segments];
   }, [height, radius, segments, width]);
 
   return (
     <>
-      <mesh geometry={geometry} {...eventHandlers}>
+      <mesh {...eventHandlers}>
+        <roundedPlaneGeometry args={args} attach={'geometry'} />
         {children}
       </mesh>
     </>
